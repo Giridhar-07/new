@@ -1,0 +1,275 @@
+/* General Styles */
+.landing-page {
+  font-family: Arial, sans-serif;
+  color: #333;
+  background-color: #f5f5f5;
+  overflow: hidden; /* Hide scrollbars */
+}
+
+/* Navigation Bar Styles */
+.navbar {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-brand {
+  font-size: 24px;
+  font-weight: bold;
+  color: #d4af37; /* Gold */
+}
+
+.navbar-menu {
+  list-style: none;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-item {
+  margin-left: 20px;
+}
+
+.navbar-item a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar-item a:hover {
+  color: #d4af37; /* Gold */
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  list-style: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: none;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu li {
+  margin: 5px 0;
+}
+
+.dropdown-menu li a {
+  color: #333;
+  text-decoration: none;
+  display: block;
+  padding: 5px 10px;
+  transition: background-color 0.3s ease;
+}
+
+.dropdown-menu li a:hover {
+  background-color: #f0f0f0;
+}
+
+/* Hero Section Styles */
+.hero {
+  background-color: #e9e4d4; /* Beige */
+  padding: 100px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero h1 {
+  font-size: 48px;
+  color: #1e3a8a; /* Deep Blue */
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hero p {
+  font-size: 20px;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.book-now-button {
+  padding: 15px 30px;
+  font-size: 18px;
+  background-color: #d4af37; /* Gold */
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.book-now-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+}
+
+.hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.hero-image img {
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  opacity: 0.6;
+  transform: scale(1.1);
+}
+
+/* Room Cards Styles */
+.rooms {
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.rooms h2 {
+  font-size: 36px;
+  color: #1e3a8a; /* Deep Blue */
+  margin-bottom: 40px;
+}
+
+.room-card {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 30px;
+  margin: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.room-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+.room-card img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.room-card h3 {
+  font-size: 24px;
+  color: #1e3a8a; /* Deep Blue */
+  margin-bottom: 15px;
+}
+
+.room-card p {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.room-card button {
+  padding: 12px 25px;
+  font-size: 16px;
+  background-color: #d4af37; /* Gold */
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 0 10px;
+}
+
+.room-card button:hover {
+  background-color: #c09527;
+}
+
+/* Testimonials Styles */
+.testimonials {
+  background-color: #1e3a8a; /* Deep Blue */
+  color: #fff;
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.testimonials h2 {
+  font-size: 36px;
+  margin-bottom: 40px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.testimonial-slider {
+  display: flex;
+  overflow-x: auto;
+  padding-bottom: 20px;
+}
+
+.testimonial {
+  min-width: 400px;
+  padding: 30px;
+  margin: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.testimonial p {
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.testimonial p:last-child {
+  font-style: italic;
+  font-size: 16px;
+  color: #ddd;
+}
+
+/* Reservation Calendar Styles */
+.reservation-calendar {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 99;
+}
+
+.reservation-calendar h3 {
+  font-size: 24px;
+  color: #1e3a8a; /* Deep Blue */
+  margin-bottom: 20px;
+}
+
+.reservation-calendar p {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 20px;
+}
