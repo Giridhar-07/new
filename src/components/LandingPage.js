@@ -25,7 +25,7 @@ function LandingPage() {
   return (
     <div className="relative bg-primary overflow-hidden h-screen">
       <img
-        src="http://127.0.0.1:8000/media/rooms/hotel_room.jpg"
+        src="https://via.placeholder.com/1200x600"
         alt="Hotel Room"
         className="absolute w-full h-full object-cover"
       />

@@ -48,7 +48,7 @@ function Reservations() {
         'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
-        room: roomId,
+        room: parseInt(roomId),
         check_in: checkIn,
         check_out: checkOut,
         guest_name: guestName,
@@ -82,55 +82,103 @@ function Reservations() {
   };
 
   return (
-    <main style={{ padding: '20px' }}>
-      <h2>Reservations</h2>
-      <div>
-        <label htmlFor="roomId">Room ID:</label>
-        <input type="text" id="roomId" value={roomId} onChange={(e) => setRoomId(e.target.value)} />
-      </div>
-      <div>
-        <label htmlFor="checkIn">Check-in Date:</label>
-        <input type="date" id="checkIn" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
-      </div>
-      <div>
-        <label htmlFor="checkOut">Check-out Date:</label>
-        <input type="date" id="checkOut" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
-      </div>
-      <button onClick={handleCheckAvailability}>Check Availability</button>
-      {availability !== null && (
-        <div>
-          {availability ? (
-            <p>This room is available for the selected dates.</p>
-          ) : (
-            <p>This room is not available for the selected dates.</p>
+    <main className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded shadow-md w-96">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">Create Reservation</h2>
+      
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="roomId" className="block text-gray-700 text-sm font-bold mb-2">Room ID:</label>
+            <input
+              type="text"
+              id="roomId"
+              value={roomId}
+              onChange={(e) => setRoomId(e.target.value)}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder="Enter Room ID"
+            />
+          </div>
+          <div>
+            <label htmlFor="checkIn" className="block text-gray-700 text-sm font-bold mb-2">Check-in Date:</label>
+            <input
+              type="date"
+              id="checkIn"
+              value={checkIn}
+              onChange={(e) => setCheckIn(e.target.value)}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+          <div>
+            <label htmlFor="checkOut" className="block text-gray-700 text-sm font-bold mb-2">Check-out Date:</label>
+            <input
+              type="date"
+              id="checkOut"
+              value={checkOut}
+              onChange={(e) => setCheckOut(e.target.value)}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+          <button onClick={handleCheckAvailability} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Check Availability</button>
+          {availability !== null && (
+            <div>
+              {availability ? (
+                <p className="text-green-500">This room is available for the selected dates.</p>
+              ) : (
+                <p className="text-red-500">This room is not available for the selected dates.</p>
+              )}
+              {discount !== null && (
+                <div>
+                  <p>Discount: {discount}%</p>
+                  <p>Total Cost: {totalCost}</p>
+                </div>
+              )}
+            </div>
           )}
-        </div>
-      )}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="guestName">Guest Name:</label>
-          <input type="text" id="guestName" value={guestName} onChange={(e) => setGuestName(e.target.value)} required />
-        </div>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        </div>
-        <button type="submit" disabled={!availability}>Submit Reservation</button>
-      </form>
-      {discount !== null && (
-        <div>
-          <p>Discount: {discount}%</p>
-          <p>Total Cost: {totalCost}</p>
-        </div>
-      )}
-      {reservations.map(reservation => (
-        <div key={reservation.id}>
-          <h3>{reservation.room}</h3>
-          <p>Check-in: {reservation.check_in}</p>
-          <p>Check-out: {reservation.check_out}</p>
-        </div>
-      ))}
+
+          <div>
+            <label htmlFor="guestName" className="block text-gray-700 text-sm font-bold mb-2">Guest Name:</label>
+            <input
+              type="text"
+              id="guestName"
+              value={guestName}
+              onChange={(e) => setGuestName(e.target.value)}
+              required
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder="Enter Guest Name"
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder="Enter Email"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={!availability}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+          >
+            Submit Reservation
+          </button>
+        </form>
+
+        <h2 className="text-xl font-bold mt-8 text-gray-800 text-center">Existing Reservations</h2>
+        {Array.isArray(reservations) && reservations.map(reservation => (
+          <div key={reservation.id} className="border rounded p-4 mt-4">
+            <h3 className="text-lg font-semibold text-gray-700">{reservation.room.name}</h3>
+            <p className="text-gray-600">Check-in: {reservation.check_in}</p>
+            <p className="text-gray-600">Check-out: {reservation.check_out}</p>
+          </div>
+        ))}
+      </div>
     </main>
   );
 }

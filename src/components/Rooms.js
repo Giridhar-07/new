@@ -5,10 +5,19 @@ function Rooms() {
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
-    fetch('/api/rooms/')
+    const token = 'YOUR_TOKEN_HERE'; // Replace with a valid token
+    fetch('/api/rooms/', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    })
       .then(response => response.json())
       .then(data => setRooms(data))
-      .catch(error => console.error('Error fetching rooms:', error));
+      .catch(error => {
+        console.error('Error fetching rooms:', error);
+        console.log('Error response:', error.message); // Log the error message
+      });
   }, []);
 
   return (
@@ -19,9 +28,8 @@ function Rooms() {
           <p className="text-gray-600">Choose your perfect room.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-          {rooms.map(room => (
+          {Array.isArray(rooms) && rooms.map(room => (
             <div key={room.id} className="bg-white rounded-lg shadow-md p-4">
-              <img src="https://via.placeholder.com/300" alt={room.name} className="rounded-t-lg" />
               <h3 className="text-xl font-semibold text-gray-700 mt-2">{room.name}</h3>
               <p className="text-gray-600">{room.description}</p>
               <Link to={`/room/${room.id}`} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block">

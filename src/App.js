@@ -7,6 +7,7 @@ import Register from './components/Register';
 import Rooms from './components/Rooms';
 import Reservations from './components/Reservations';
 import RoomDetails from './components/RoomDetails';
+import Chatbot from './components/Chatbot';
 import './App.css';
 
 function App() {
@@ -19,10 +20,11 @@ function App() {
         <Route path="/" element={token ? <LandingPage /> : <Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/rooms" element={token ? <Rooms /> : <Navigate to="/login" />} />
+        <Route path="/rooms" element={<Rooms />} />
         <Route path="/reservations" element={token ? <Reservations /> : <Navigate to="/login" />} />
         <Route path="/room/:id" element={token ? <RoomDetails /> : <Navigate to="/login" />} />
       </Routes>
+      <Chatbot />
     </Router>
   );
 }
