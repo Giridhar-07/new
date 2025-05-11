@@ -28,7 +28,7 @@ function Rooms() {
           <p className="text-gray-600">Choose your perfect room.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-          {Array.isArray(rooms) && rooms.map(room => (
+          {rooms.map(room => (
             <div key={room.id} className="bg-white rounded-lg shadow-md p-4">
               <h3 className="text-xl font-semibold text-gray-700 mt-2">{room.name}</h3>
               <p className="text-gray-600">{room.description}</p>
