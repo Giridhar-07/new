@@ -15,12 +15,8 @@ function Reservations() {
   useEffect(() => {
     // Temporarily hardcode token for testing
     localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3MTU4ODc0LCJpYXQiOjE3NDcxNTg1NzQsImp0aSI6IjgzMzI5ZGExYTI1ODQxZWQ5MDBjOTkzN2E5MzU5M2M1IiwidXNlcl9pZCI6M30.OhVvg9b2cv3CazPRIjNmD5UNOMCSy9aZOcGNxYfvlNM');
-    const token = localStorage.getItem('token');
-    fetch('http://127.0.0.1:8000/api/reservations/', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
+    // Removed Authorization header for testing with AllowAny
+    fetch('http://127.0.0.1:8000/api/reservations/')
       .then(response => response.json())
       .then(data => setReservations(data));
   }, []);
@@ -37,14 +33,10 @@ function Reservations() {
     }
 
     setError(''); // Clear previous errors
-    const token = localStorage.getItem('token');
+    // Removed Authorization header for testing with AllowAny
     console.log('Checking availability for Room ID:', roomId, 'Check-in:', checkIn, 'Check-out:', checkOut);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/check_availability/?room_id=${roomId}&check_in=${checkIn}&check_out=${checkOut}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await fetch(`http://127.0.0.1:8000/api/check_availability/?room_id=${roomId}&check_in=${checkIn}&check_out=${checkOut}`);
 
       console.log('Availability API response status:', response.status);
       const data = await response.json();
@@ -65,12 +57,11 @@ function Reservations() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const token = localStorage.getItem('token');
+    // Removed Authorization header for testing with AllowAny
     const response = await fetch('http://localhost:8000/api/reservations/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
         room: parseInt(roomId),
@@ -84,12 +75,10 @@ function Reservations() {
     const data = await response.json();
 
     if (response.ok) {
+      console.log('Reservation submitted successfully');
       // Refresh the reservations list
-      fetch('http://localhost:8000/api/reservations/', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
+      // Removed Authorization header for testing with AllowAny
+      fetch('http://localhost:8000/api/reservations/')
         .then(response => response.json())
         .then(data => setReservations(data));
       // Reset the form
@@ -101,6 +90,7 @@ function Reservations() {
       setAvailability(null);
       setError('');
     } else {
+      console.error('Failed to submit reservation:', data.error);
       // Display an error message
       setError(data.error || 'Failed to submit reservation');
     }

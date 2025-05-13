@@ -22,7 +22,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/rooms" element={<Rooms />} />
         <Route path="/reservations" element={<Reservations />} /> {/* Temporarily bypass token check */}
-        <Route path="/room/:id" element={token ? <RoomDetails /> : <Navigate to="/login" />} />
+        <Route path="/room/:id" element={<RoomDetails />} /> {/* Temporarily bypass token check */}
       </Routes>
       <Chatbot />
     </Router>
