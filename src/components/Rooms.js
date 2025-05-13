@@ -6,12 +6,7 @@ function Rooms() {
 
   useEffect(() => {
     const token = 'YOUR_TOKEN_HERE'; // Replace with a valid token
-    fetch('/api/rooms/', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      }
-    })
+    fetch('/api/rooms/')
       .then(response => response.json())
       .then(data => {
         console.log('Fetched rooms data:', data);

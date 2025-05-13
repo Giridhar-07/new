@@ -13,6 +13,8 @@ function Reservations() {
   const [totalCost, setTotalCost] = useState(null);
 
   useEffect(() => {
+    // Temporarily hardcode token for testing
+    localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3MTU4ODc0LCJpYXQiOjE3NDcxNTg1NzQsImp0aSI6IjgzMzI5ZGExYTI1ODQxZWQ5MDBjOTkzN2E5MzU5M2M1IiwidXNlcl9pZCI6M30.OhVvg9b2cv3CazPRIjNmD5UNOMCSy9aZOcGNxYfvlNM');
     const token = localStorage.getItem('token');
     fetch('http://127.0.0.1:8000/api/reservations/', {
       headers: {
@@ -24,26 +26,40 @@ function Reservations() {
   }, []);
 
   const handleCheckAvailability = async () => {
+    console.log('Check Availability button clicked');
     if (!roomId || !checkIn || !checkOut) {
       setError('Please fill in Room ID, Check-in Date, and Check-out Date.');
       setAvailability(null);
       setDiscount(null);
       setTotalCost(null);
+      console.log('Missing parameters for availability check');
       return;
     }
 
     setError(''); // Clear previous errors
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://127.0.0.1:8000/api/check_availability/?room_id=${roomId}&check_in=${checkIn}&check_out=${checkOut}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    const data = await response.json();
-    setAvailability(data.available);
-    setError(data.error || '');
-    setDiscount(data.discount);
-    setTotalCost(data.total_cost);
+    console.log('Checking availability for Room ID:', roomId, 'Check-in:', checkIn, 'Check-out:', checkOut);
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/check_availability/?room_id=${roomId}&check_in=${checkIn}&check_out=${checkOut}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      console.log('Availability API response status:', response.status);
+      const data = await response.json();
+      console.log('Availability API response data:', data);
+
+      setAvailability(data.available);
+      setError(data.error || '');
+      setDiscount(data.discount);
+      setTotalCost(data.total_cost);
+      console.log('Availability check result:', data.available);
+
+    } catch (error) {
+      console.error('Error during availability check fetch:', error);
+      setError('An error occurred during availability check.');
+    }
   };
 
   const handleSubmit = async (event) => {

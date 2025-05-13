@@ -1,30 +1,41 @@
 import React, { useState } from 'react';
 
 function Login() {
+  console.log('Login component rendered');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log('Login form submitted');
+    console.log('Username:', username, 'Password:', password);
 
-    const response = await fetch('http://127.0.0.1:8000/api/login/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, password })
-    });
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+      });
 
-    const data = await response.json();
+      console.log('Login API response status:', response.status);
+      const data = await response.json();
+      console.log('Login API response data:', data);
 
-    if (response.ok) {
-      // Store the token in local storage
-      localStorage.setItem('token', data.access);
-      // Redirect to the home page or another protected route
-      window.location.href = '/rooms';
-    } else {
-      // Display an error message
-      alert(data.error);
+      if (response.ok) {
+        console.log('Login successful, storing token:', data.access);
+        localStorage.setItem('token', data.access);
+        // Redirect to the home page or another protected route
+        window.location.href = '/rooms';
+      } else {
+        console.error('Login failed:', data.error);
+        // Display an error message
+        alert(data.error);
+      }
+    } catch (error) {
+      console.error('Error during login fetch:', error);
+      alert('An error occurred during login.');
     }
   };
 
@@ -59,6 +70,7 @@ function Login() {
           <button
             type="submit"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            onClick={() => console.log('Login button clicked')}
           >
             Login
           </button>
