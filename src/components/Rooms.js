@@ -13,7 +13,10 @@ function Rooms() {
       }
     })
       .then(response => response.json())
-      .then(data => setRooms(data))
+      .then(data => {
+        console.log('Fetched rooms data:', data);
+        setRooms(data);
+      })
       .catch(error => {
         console.error('Error fetching rooms:', error);
         console.log('Error response:', error.message); // Log the error message

@@ -24,6 +24,15 @@ function Reservations() {
   }, []);
 
   const handleCheckAvailability = async () => {
+    if (!roomId || !checkIn || !checkOut) {
+      setError('Please fill in Room ID, Check-in Date, and Check-out Date.');
+      setAvailability(null);
+      setDiscount(null);
+      setTotalCost(null);
+      return;
+    }
+
+    setError(''); // Clear previous errors
     const token = localStorage.getItem('token');
     const response = await fetch(`http://127.0.0.1:8000/api/check_availability/?room_id=${roomId}&check_in=${checkIn}&check_out=${checkOut}`, {
       headers: {
