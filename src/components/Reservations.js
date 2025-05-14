@@ -13,12 +13,20 @@ function Reservations() {
   const [totalCost, setTotalCost] = useState(null);
 
   useEffect(() => {
-    // Temporarily hardcode token for testing
-    localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3MTU4ODc0LCJpYXQiOjE3NDcxNTg1NzQsImp0aSI6IjgzMzI5ZGExYTI1ODQxZWQ5MDBjOTkzN2E5MzU5M2M1IiwidXNlcl9pZCI6M30.OhVvg9b2cv3CazPRIjNmD5UNOMCSy9aZOcGNxYfvlNM');
-    // Removed Authorization header for testing with AllowAny
-    fetch('http://127.0.0.1:8000/api/reservations/')
-      .then(response => response.json())
-      .then(data => setReservations(data));
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetch('http://127.0.0.1:8000/api/reservations/', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+        .then(response => response.json())
+        .then(data => setReservations(data))
+        .catch(error => console.error('Error fetching reservations:', error));
+    } else {
+      // Handle case where user is not logged in, maybe redirect to login
+      console.log('No token found, user not logged in.');
+    }
   }, []);
 
   const handleCheckAvailability = async () => {
@@ -33,10 +41,18 @@ function Reservations() {
     }
 
     setError(''); // Clear previous errors
-    // Removed Authorization header for testing with AllowAny
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('You must be logged in to check availability.');
+      return;
+    }
     console.log('Checking availability for Room ID:', roomId, 'Check-in:', checkIn, 'Check-out:', checkOut);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/check_availability/?room_id=${roomId}&check_in=${checkIn}&check_out=${checkOut}`);
+      const response = await fetch(`http://127.0.0.1:8000/api/check_availability/?room_id=${roomId}&check_in=${checkIn}&check_out=${checkOut}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
       console.log('Availability API response status:', response.status);
       const data = await response.json();
@@ -57,11 +73,17 @@ function Reservations() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Removed Authorization header for testing with AllowAny
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('You must be logged in to make a reservation.');
+      return;
+    }
+
     const response = await fetch('http://localhost:8000/api/reservations/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
         room: parseInt(roomId),
@@ -77,10 +99,15 @@ function Reservations() {
     if (response.ok) {
       console.log('Reservation submitted successfully');
       // Refresh the reservations list
-      // Removed Authorization header for testing with AllowAny
-      fetch('http://localhost:8000/api/reservations/')
+      // Refresh the reservations list
+      fetch('http://localhost:8000/api/reservations/', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
         .then(response => response.json())
-        .then(data => setReservations(data));
+        .then(data => setReservations(data))
+        .catch(error => console.error('Error fetching reservations:', error));
       // Reset the form
       setRoomId('');
       setCheckIn('');
