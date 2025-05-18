@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 function Reservations() {
   const [reservations, setReservations] = useState([]);
   const [roomId, setRoomId] = useState('');
-  const [checkIn, setCheckIn] = useState('');
-  const [checkOut, setCheckOut] = useState('');
+  const [checkIn, setCheckIn] = useState(new Date());
+  const [checkOut, setCheckOut] = useState(new Date());
   const [availability, setAvailability] = useState(null);
   const [error, setError] = useState('');
   const [guestName, setGuestName] = useState('');
@@ -46,9 +46,9 @@ function Reservations() {
       setError('You must be logged in to check availability.');
       return;
     }
-    console.log('Checking availability for Room ID:', roomId, 'Check-in:', checkIn, 'Check-out:', checkOut);
+    console.log('Checking availability for Room ID:', roomId, 'Check-in:', checkIn.toISOString().split('T')[0], 'Check-out:', checkOut.toISOString().split('T')[0]);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/check_availability/?room_id=${roomId}&check_in=${checkIn}&check_out=${checkOut}`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/check_availability/?room_id=${roomId}&check_in=${checkIn.toISOString().split('T')[0]}&check_out=${checkOut.toISOString().split('T')[0]}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -79,7 +79,7 @@ function Reservations() {
       return;
     }
 
-    const response = await fetch('http://localhost:8000/api/reservations/', {
+    const response = await fetch('http://127.0.0.1:8000/api/reservations/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -87,8 +87,8 @@ function Reservations() {
       },
       body: JSON.stringify({
         room: parseInt(roomId),
-        check_in: checkIn,
-        check_out: checkOut,
+        check_in: checkIn.toISOString().split('T')[0],
+        check_out: checkOut.toISOString().split('T')[0],
         guest_name: guestName,
         email: email
       })
@@ -99,8 +99,7 @@ function Reservations() {
     if (response.ok) {
       console.log('Reservation submitted successfully');
       // Refresh the reservations list
-      // Refresh the reservations list
-      fetch('http://localhost:8000/api/reservations/', {
+      fetch('http://127.0.0.1:8000/api/reservations/', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -110,8 +109,8 @@ function Reservations() {
         .catch(error => console.error('Error fetching reservations:', error));
       // Reset the form
       setRoomId('');
-      setCheckIn('');
-      setCheckOut('');
+      setCheckIn(new Date());
+      setCheckOut(new Date());
       setGuestName('');
       setEmail('');
       setAvailability(null);
@@ -147,8 +146,8 @@ function Reservations() {
             <input
               type="date"
               id="checkIn"
-              value={checkIn}
-              onChange={(e) => setCheckIn(e.target.value)}
+              value={checkIn.toISOString().split('T')[0]}
+              onChange={(e) => setCheckIn(new Date(e.target.value))}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
           </div>
@@ -157,8 +156,8 @@ function Reservations() {
             <input
               type="date"
               id="checkOut"
-              value={checkOut}
-              onChange={(e) => setCheckOut(e.target.value)}
+              value={checkOut.toISOString().split('T')[0]}
+              onChange={(e) => setCheckOut(new Date(e.target.value))}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
           </div>
