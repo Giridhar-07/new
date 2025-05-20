@@ -37,15 +37,48 @@ function LandingPage() {
   };
 
   const testimonials = [
-    { id: 1, content: "Exceptional service and luxurious accommodations. Highly recommended!", author: "John Doe", image: "https://via.placeholder.com/50" },
-    { id: 2, content: "The perfect getaway. Beautiful surroundings and top-notch amenities.", author: "Jane Smith", image: "https://via.placeholder.com/50" },
-    { id: 3, content: "A truly unforgettable experience. The staff went above and beyond to make our stay special.", author: "David Lee", image: "https://via.placeholder.com/50" }
+    { 
+      id: 1, 
+      content: "Exceptional service and luxurious accommodations. The attention to detail and personalized care made our stay unforgettable.", 
+      author: "John Anderson",
+      title: "Business Traveler",
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&q=80&w=200"
+    },
+    { 
+      id: 2, 
+      content: "The perfect getaway. Beautiful surroundings, incredible dining, and the spa services were absolutely world-class.", 
+      author: "Emma Thompson",
+      title: "Travel Blogger",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&q=80&w=200"
+    },
+    { 
+      id: 3, 
+      content: "A truly remarkable experience. The staff anticipated our every need and the amenities exceeded all expectations.", 
+      author: "Michael Chen",
+      title: "Luxury Travel Enthusiast",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&q=80&w=200"
+    }
   ];
 
   const features = [
-    { id: 1, title: "Luxurious Rooms", description: "Experience ultimate comfort in our elegantly designed rooms.", image: "https://via.placeholder.com/350x200" },
-    { id: 2, title: "Fine Dining", description: "Savor exquisite cuisine at our award-winning restaurants.", image: "https://via.placeholder.com/350x200" },
-    { id: 3, title: "Relaxing Spa", description: "Indulge in rejuvenating treatments at our serene spa.", image: "https://via.placeholder.com/350x200" }
+    { 
+      id: 1, 
+      title: "Luxurious Rooms", 
+      description: "Experience ultimate comfort in our elegantly designed rooms.", 
+      image: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&q=80&w=1000" 
+    },
+    { 
+      id: 2, 
+      title: "Fine Dining", 
+      description: "Savor exquisite cuisine at our award-winning restaurants.", 
+      image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&q=80&w=1000" 
+    },
+    { 
+      id: 3, 
+      title: "Relaxing Spa", 
+      description: "Indulge in rejuvenating treatments at our serene spa.", 
+      image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&q=80&w=1000" 
+    }
   ];
 
   return (
@@ -67,9 +100,13 @@ function LandingPage() {
             <Slider {...settings}>
               {features.map(feature => (
                   <div key={feature.id} className="text-center">
-                    <img src={feature.image} alt={feature.title} className="w-full h-48 object-cover rounded-md mb-4" />
-                    <h3 className="text-2xl font-semibold text-white mb-2">{feature.title}</h3>
-                    <p className="text-gray-300">{feature.description}</p>
+                    <div className="px-4">
+                      <div className="bg-gray-900 rounded-lg p-4 transform transition-transform hover:scale-105">
+                        <img src={feature.image} alt={feature.title} className="w-full h-64 object-cover rounded-lg mb-4 shadow-lg" />
+                        <h3 className="text-2xl font-semibold text-white mb-2">{feature.title}</h3>
+                        <p className="text-gray-300 text-lg">{feature.description}</p>
+                      </div>
+                    </div>
                   </div>
               ))}
             </Slider>
@@ -82,9 +119,18 @@ function LandingPage() {
             <Slider {...settings}>
               {testimonials.map(testimonial => (
                   <div key={testimonial.id} className="text-center">
-                    <img src={testimonial.image} alt={testimonial.author} className="rounded-full w-20 h-20 mx-auto mb-4" />
-                    <p className="text-gray-300 italic mb-4">"{testimonial.content}"</p>
-                    <p className="text-white font-semibold">- {testimonial.author}</p>
+                    <div className="bg-gray-900 rounded-lg p-8 mx-4 transform transition-transform hover:scale-105">
+                      <img 
+                        src={testimonial.image} 
+                        alt={testimonial.author} 
+                        className="rounded-full w-24 h-24 mx-auto mb-6 object-cover border-4 border-accent shadow-lg" 
+                      />
+                      <p className="text-gray-300 italic mb-6 text-lg leading-relaxed">"{testimonial.content}"</p>
+                      <div className="text-center">
+                        <p className="text-white font-semibold text-xl mb-1">{testimonial.author}</p>
+                        <p className="text-accent text-sm">{testimonial.title}</p>
+                      </div>
+                    </div>
                   </div>
               ))}
             </Slider>
