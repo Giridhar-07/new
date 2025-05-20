@@ -18,7 +18,7 @@ function Chatbot() {
 
   const getGeminiResponse = (message) => {
     // Replace with actual Gemini API call
-    return `This is a placeholder response from Gemini for: ${message}`;
+    return `Thank you for your message: ${message}. We will get back to you soon.`;
   };
 
   return (

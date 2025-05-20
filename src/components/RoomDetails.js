@@ -47,37 +47,37 @@ function RoomDetails() {
 
   return (
     <div className="container mx-auto mt-8">
-      <div className="bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">{room.name}</h1>
-        <p className="text-gray-600 mb-4">{room.description}</p>
-        <Slider
-          dots={true}
-          infinite={true}
-          speed={500}
-          slidesToShow={1}
-          slidesToScroll={1}
-          autoplay={true}
-          autoplaySpeed={3000}
-          cssEase="linear"
-        >
-          {room.images && room.images.map((image, index) => (
-            <div key={index}>
-              <img src={image} alt={`Room ${index + 1}`} className="w-full h-64 object-cover rounded-lg mb-4 shadow-lg" />
+        <div className="bg-white rounded-lg shadow-md p-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-4 shadow-md">{room.name}</h1>
+          <p className="text-gray-600 mb-4 shadow-md">{room.description}</p>
+          <Slider
+            dots={true}
+            infinite={true}
+            speed={500}
+            slidesToShow={1}
+            slidesToScroll={1}
+            autoplay={true}
+            autoplaySpeed={3000}
+            cssEase="linear"
+          >
+            {room.images && room.images.map((image, index) => (
+              <div key={index}>
+                <img src={image} alt={`Room ${index + 1}`} className="w-full h-64 object-cover rounded-lg mb-4 shadow-lg" />
+              </div>
+            ))}
+          </Slider>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-white hover:text-gray-200 bg-primary rounded-md p-2 transition-colors duration-300 transform hover:scale-105 hover:shadow-lg"><span className="font-semibold">Number of beds:</span> {room.num_beds}</p>
+              <p className="text-white hover:text-gray-200 bg-primary rounded-md p-2 transition-colors duration-300 transform hover:scale-105 hover:shadow-lg"><span className="font-semibold">Allowed guests:</span> {room.max_occupants}</p>
+              <p className="text-white hover:text-gray-200 bg-primary rounded-md p-2 transition-colors duration-300 transform hover:scale-105 hover:shadow-lg"><span className="font-semibold">Price per night:</span> ${room.price_per_night}</p>
             </div>
-          ))}
-        </Slider>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-gray-700"><span className="font-semibold">Number of beds:</span> {room.num_beds}</p>
-            <p className="text-gray-700"><span className="font-semibold">Allowed guests:</span> {room.max_occupants}</p>
-            <p className="text-gray-700"><span className="font-semibold">Price per night:</span> ${room.price_per_night}</p>
+            <div>
+              <p className="text-white hover:text-gray-200 bg-primary rounded-md p-2 transition-colors duration-300 transform hover:scale-105 hover:shadow-lg"><span className="font-semibold">AC:</span> {room.ac ? 'Yes' : 'No'}</p>
+              <p className="text-white hover:text-gray-200 bg-primary rounded-md p-2 transition-colors duration-300 transform hover:scale-105 hover:shadow-lg"><span className="font-semibold">Pet policy:</span> {room.pets_allowed ? 'Yes' : 'No'}</p>
+              <p className="text-white hover:text-gray-200 bg-primary rounded-md p-2 transition-colors duration-300 transform hover:scale-105 hover:shadow-lg"><span className="font-semibold">Wi-Fi:</span> {room.wifi ? 'Yes' : 'No'}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-gray-700"><span className="font-semibold">AC:</span> {room.ac ? 'Yes' : 'No'}</p>
-            <p className="text-gray-700"><span className="font-semibold">Pet policy:</span> {room.pets_allowed ? 'Yes' : 'No'}</p>
-            <p className="text-gray-700"><span className="font-semibold">Wi-Fi:</span> {room.wifi ? 'Yes' : 'No'}</p>
-          </div>
-        </div>
       </div>
     </div>
   );
