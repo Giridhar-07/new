@@ -82,7 +82,12 @@ function LandingPage() {
   ];
 
   return (
-      <div className="relative bg-primary overflow-hidden">
+      <div className="relative bg-primary overflow-hidden" style={{
+        backgroundImage: `url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&q=80&w=2000')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
         <div className="absolute inset-0 bg-black opacity-60"></div>
         <div className="container mx-auto px-4 relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">

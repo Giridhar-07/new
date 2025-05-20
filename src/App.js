@@ -24,7 +24,7 @@ function App() {
         <Route path="/reservations" element={token ? <Reservations /> : <Navigate to="/login" />} />
         <Route path="/room/:id" element={token ? <RoomDetails /> : <Navigate to="/login" />} />
       </Routes>
-      <Chatbot />
+      <Chatbot/>
     </Router>
   );
 }

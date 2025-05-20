@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import Slider from 'react-slick';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 function RoomDetails() {
   const { id } = useParams();
@@ -47,6 +50,22 @@ function RoomDetails() {
       <div className="bg-white rounded-lg shadow-md p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">{room.name}</h1>
         <p className="text-gray-600 mb-4">{room.description}</p>
+        <Slider
+          dots={true}
+          infinite={true}
+          speed={500}
+          slidesToShow={1}
+          slidesToScroll={1}
+          autoplay={true}
+          autoplaySpeed={3000}
+          cssEase="linear"
+        >
+          {room.images && room.images.map((image, index) => (
+            <div key={index}>
+              <img src={image} alt={`Room ${index + 1}`} className="w-full h-64 object-cover rounded-lg mb-4 shadow-lg" />
+            </div>
+          ))}
+        </Slider>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <p className="text-gray-700"><span className="font-semibold">Number of beds:</span> {room.num_beds}</p>
