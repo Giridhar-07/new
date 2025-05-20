@@ -1,21 +1,29 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import {
-  HomeIcon,
-  BedDouble,
-  UtensilsCrossed,
-  Flower,
-  Users,
-  Mail,
-  SunMoon,
-} from 'lucide-react';
-import { Dock, DockIcon, DockItem, DockLabel } from './ui/dock';
 
 function LandingPage() {
-  const navigate = useNavigate();
+  const [rooms, setRooms] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    fetch('http://127.0.0.1:8000/api/rooms/', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setRooms(data);
+        } else {
+          console.error("API returned non-array data:", data);
+        }
+      })
+      .catch(error => console.error("Error fetching rooms:", error));
+  }, []);
 
   const settings = {
     dots: true,
@@ -73,115 +81,62 @@ function LandingPage() {
     }
   ];
 
-  const dockItems = [
-    {
-      title: 'Home',
-      icon: <HomeIcon className='h-full w-full text-neutral-600 dark:text-neutral-300' />,
-      onClick: () => navigate('/'),
-    },
-    {
-      title: 'Rooms',
-      icon: <BedDouble className='h-full w-full text-neutral-600 dark:text-neutral-300' />,
-      onClick: () => navigate('/rooms'),
-    },
-    {
-      title: 'Dining',
-      icon: <UtensilsCrossed className='h-full w-full text-neutral-600 dark:text-neutral-300' />,
-      onClick: () => navigate('/dining'),
-    },
-    {
-      title: 'Spa',
-      icon: <Flower className='h-full w-full text-neutral-600 dark:text-neutral-300' />,
-      onClick: () => navigate('/spa'),
-    },
-    {
-      title: 'About Us',
-      icon: <Users className='h-full w-full text-neutral-600 dark:text-neutral-300' />,
-      onClick: () => navigate('/about'),
-    },
-    {
-      title: 'Contact',
-      icon: <Mail className='h-full w-full text-neutral-600 dark:text-neutral-300' />,
-      onClick: () => navigate('/contact'),
-    },
-    {
-      title: 'Theme',
-      icon: <SunMoon className='h-full w-full text-neutral-600 dark:text-neutral-300' />,
-      onClick: () => document.body.classList.toggle('dark'),
-    },
-  ];
-
   return (
-    <div className="relative bg-primary overflow-hidden">
-      <div className="absolute inset-0 bg-black opacity-60"></div>
-      <div className="container mx-auto px-4 relative z-10 flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h2 className="text-5xl font-bold text-white mb-4">Experience Hospitality Like Never Before</h2>
-          <p className="text-lg text-gray-300 mb-8">Discover unparalleled luxury and personalized service at our exquisite hotel.</p>
-          <Link to="/rooms" className="bg-accent hover:bg-accent-dark text-white font-bold py-3 px-8 rounded-full mt-4 inline-block">
-            Discover Rooms
-          </Link>
+      <div className="relative bg-primary overflow-hidden">
+        <div className="absolute inset-0 bg-black opacity-60"></div>
+        <div className="container mx-auto px-4 relative z-10 flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <h2 className="text-5xl font-bold text-white mb-4">Experience Hospitality Like Never Before</h2>
+            <p className="text-lg text-gray-300 mb-8">Discover unparalleled luxury and personalized service at our exquisite hotel.</p>
+            <Link to="/rooms" className="bg-accent hover:bg-accent-dark text-white font-bold py-3 px-8 rounded-full mt-4 inline-block">
+              Discover Rooms
+            </Link>
+          </div>
         </div>
-      </div>
 
-      <section className="py-16 bg-secondary">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">Hotel Features</h2>
-          <Slider {...settings}>
-            {features.map(feature => (
-              <div key={feature.id} className="text-center">
-                <div className="px-4">
-                  <div className="bg-gray-900 rounded-lg p-4 transform transition-transform hover:scale-105">
-                    <img src={feature.image} alt={feature.title} className="w-full h-64 object-cover rounded-lg mb-4 shadow-lg" />
-                    <h3 className="text-2xl font-semibold text-white mb-2">{feature.title}</h3>
-                    <p className="text-gray-300 text-lg">{feature.description}</p>
+        <section className="py-16 bg-secondary">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-white mb-8 text-center">Hotel Features</h2>
+            <Slider {...settings}>
+              {features.map(feature => (
+                  <div key={feature.id} className="text-center">
+                    <div className="px-4">
+                      <div className="bg-gray-900 rounded-lg p-4 transform transition-transform hover:scale-105">
+                        <img src={feature.image} alt={feature.title} className="w-full h-64 object-cover rounded-lg mb-4 shadow-lg" />
+                        <h3 className="text-2xl font-semibold text-white mb-2">{feature.title}</h3>
+                        <p className="text-gray-300 text-lg">{feature.description}</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </Slider>
-        </div>
-      </section>
+              ))}
+            </Slider>
+          </div>
+        </section>
 
-      <section className="py-16 bg-primary">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">Testimonials</h2>
-          <Slider {...settings}>
-            {testimonials.map(testimonial => (
-              <div key={testimonial.id} className="text-center">
-                <div className="bg-gray-900 rounded-lg p-8 mx-4 transform transition-transform hover:scale-105">
-                  <img 
-                    src={testimonial.image} 
-                    alt={testimonial.author} 
-                    className="rounded-full w-24 h-24 mx-auto mb-6 object-cover border-4 border-accent shadow-lg" 
-                  />
-                  <p className="text-gray-300 italic mb-6 text-lg leading-relaxed">"{testimonial.content}"</p>
-                  <div className="text-center">
-                    <p className="text-white font-semibold text-xl mb-1">{testimonial.author}</p>
-                    <p className="text-accent text-sm">{testimonial.title}</p>
+        <section className="py-16 bg-primary">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-white mb-8 text-center">Testimonials</h2>
+            <Slider {...settings}>
+              {testimonials.map(testimonial => (
+                  <div key={testimonial.id} className="text-center">
+                    <div className="bg-gray-900 rounded-lg p-8 mx-4 transform transition-transform hover:scale-105">
+                      <img 
+                        src={testimonial.image} 
+                        alt={testimonial.author} 
+                        className="rounded-full w-24 h-24 mx-auto mb-6 object-cover border-4 border-accent shadow-lg" 
+                      />
+                      <p className="text-gray-300 italic mb-6 text-lg leading-relaxed">"{testimonial.content}"</p>
+                      <div className="text-center">
+                        <p className="text-white font-semibold text-xl mb-1">{testimonial.author}</p>
+                        <p className="text-accent text-sm">{testimonial.title}</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </Slider>
-        </div>
-      </section>
-
-      <div className="fixed bottom-0 left-0 right-0 z-50">
-        <Dock>
-          {dockItems.map((item, idx) => (
-            <DockItem
-              key={idx}
-              className="aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 cursor-pointer"
-              onClick={item.onClick}
-            >
-              <DockLabel>{item.title}</DockLabel>
-              <DockIcon>{item.icon}</DockIcon>
-            </DockItem>
-          ))}
-        </Dock>
+              ))}
+            </Slider>
+          </div>
+        </section>
       </div>
-    </div>
   );
 }
 
