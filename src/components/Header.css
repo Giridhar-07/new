@@ -1,9 +1,10 @@
+/* Logo Styles */
 .logo-animation {
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .logo-animation:hover {
-  transform: scale(1.2) rotate(10deg);
+  transform: scale(1.1) rotate(5deg);
   cursor: pointer;
 }
 
@@ -17,52 +18,27 @@
 }
 
 .animate-bounce {
-  animation: bounce 0.5s ease-in-out;
+  animation: bounce 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Navigation Styles */
 nav {
-  background: linear-gradient(to right, #1a202c, #2d3748);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  backdrop-filter: blur(10px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 nav.hover-effect:hover {
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
-.text-gray-300 {
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.text-gray-300:hover {
-  transform: translateY(-2px);
-  color: white;
-}
-
-.text-gray-300::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  bottom: -4px;
-  left: 0;
-  background-color: #ffffff;
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-}
-
-.text-gray-300:hover::after {
-  transform: scaleX(1);
-}
-
-.text-xl {
-  transition: color 0.3s ease;
-  background: linear-gradient(120deg, #ffffff 0%, #cbd5e0 100%);
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(120deg, #64B5F6 0%, #E1BEE7 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: shimmer 2s infinite;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  animation: shimmer 3s ease infinite;
 }
 
 @keyframes shimmer {
@@ -72,4 +48,173 @@ nav.hover-effect:hover {
   100% {
     background-position: 200% center;
   }
+}
+
+/* Navigation Links */
+.nav-link {
+  color: #cbd5e0;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #64B5F6, #E1BEE7);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-link:hover {
+  color: white;
+  transform: translateY(-2px);
+}
+
+.nav-link:hover::before {
+  width: 100%;
+}
+
+/* Auth Buttons */
+.auth-button {
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.auth-button.login {
+  background: transparent;
+  border: 2px solid #64B5F6;
+  color: #64B5F6;
+}
+
+.auth-button.login:hover {
+  background: #64B5F6;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.auth-button.register {
+  background: linear-gradient(90deg, #64B5F6, #E1BEE7);
+  color: white;
+}
+
+.auth-button.register:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(100, 181, 246, 0.4);
+}
+
+.auth-button.logout {
+  background: transparent;
+  border: 2px solid #EF5350;
+  color: #EF5350;
+}
+
+.auth-button.logout:hover {
+  background: #EF5350;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Mobile Menu Button */
+.burger-menu {
+  width: 30px;
+  height: 25px;
+  position: relative;
+  cursor: pointer;
+}
+
+.burger-line {
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  position: absolute;
+  transition: all 0.3s ease;
+}
+
+.burger-line:nth-child(1) {
+  top: 0;
+}
+
+.burger-line:nth-child(2) {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.burger-line:nth-child(3) {
+  bottom: 0;
+}
+
+.burger-line.open:nth-child(1) {
+  transform: rotate(45deg);
+  top: 50%;
+}
+
+.burger-line.open:nth-child(2) {
+  opacity: 0;
+}
+
+.burger-line.open:nth-child(3) {
+  transform: rotate(-45deg);
+  bottom: 40%;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  padding: 1rem;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+}
+
+.mobile-menu.open {
+  max-height: 300px;
+}
+
+.mobile-nav-link {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #cbd5e0;
+  transition: all 0.3s ease;
+}
+
+.mobile-nav-link:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+}
+
+.mobile-auth-button {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  text-align: center;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.mobile-auth-button.login {
+  background: transparent;
+  border: 2px solid #64B5F6;
+  color: #64B5F6;
+}
+
+.mobile-auth-button.register {
+  background: linear-gradient(90deg, #64B5F6, #E1BEE7);
+  color: white;
+}
+
+.mobile-auth-button.logout {
+  background: transparent;
+  border: 2px solid #EF5350;
+  color: #EF5350;
 }
