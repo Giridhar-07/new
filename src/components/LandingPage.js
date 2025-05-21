@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import './LandingPage.css';
 
 function LandingPage() {
   const [rooms, setRooms] = useState([]);
@@ -82,7 +83,7 @@ function LandingPage() {
   ];
 
   return (
-      <div className="relative bg-primary overflow-hidden" style={{
+      <div className="relative bg-primary overflow-hidden landing-page" style={{
         backgroundImage: `url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&q=80&w=2000')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -91,9 +92,9 @@ function LandingPage() {
         <div className="absolute inset-0 bg-black opacity-60"></div>
         <div className="container mx-auto px-4 relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
-            <h2 className="text-5xl font-bold text-white mb-4">Experience Hospitality Like Never Before</h2>
-            <p className="text-lg text-gray-300 mb-8">Discover unparalleled luxury and personalized service at our exquisite hotel.</p>
-            <Link to="/rooms" className="bg-accent hover:bg-accent-dark text-white font-bold py-3 px-8 rounded-full mt-4 inline-block">
+            <h2 className="text-5xl font-bold text-white mb-4 animated-heading">Experience Hospitality Like Never Before</h2>
+            <p className="text-lg text-gray-300 mb-8 animated-paragraph">Discover unparalleled luxury and personalized service at our exquisite hotel.</p>
+            <Link to="/rooms" className="bg-accent hover:bg-accent-dark text-white font-bold py-3 px-8 rounded-full mt-4 inline-block animated-button">
               Discover Rooms
             </Link>
           </div>
@@ -106,7 +107,7 @@ function LandingPage() {
               {features.map(feature => (
                   <div key={feature.id} className="text-center">
                     <div className="px-4">
-                      <div className="bg-gray-900 rounded-lg p-4 transform transition-transform hover:scale-105">
+                      <div className="bg-gray-900 rounded-lg p-4 transform transition-transform hover:scale-105 feature-card">
                         <img src={feature.image} alt={feature.title} className="w-full h-64 object-cover rounded-lg mb-4 shadow-lg" />
                         <h3 className="text-2xl font-semibold text-white mb-2">{feature.title}</h3>
                         <p className="text-gray-300 text-lg">{feature.description}</p>
@@ -124,7 +125,7 @@ function LandingPage() {
             <Slider {...settings}>
               {testimonials.map(testimonial => (
                   <div key={testimonial.id} className="text-center">
-                    <div className="bg-gray-900 rounded-lg p-8 mx-4 transform transition-transform hover:scale-105">
+                    <div className="bg-gray-900 rounded-lg p-8 mx-4 transform transition-transform hover:scale-105 testimonial-card">
                       <img 
                         src={testimonial.image} 
                         alt={testimonial.author} 

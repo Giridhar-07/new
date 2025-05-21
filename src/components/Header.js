@@ -1,13 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../public/images/envHub_logo.png'; // Import the logo
+import './Header.css';
 
 function Header() {
   return (
     <nav className="bg-gray-800 shadow">
       <div className="container mx-auto py-4 px-6">
         <div className="flex items-center justify-between">
-          <div className="text-xl font-bold text-white">
-            <Link to="/">Hotel Booking</Link>
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center">
+              <img src={logo} alt="env Hub Logo" className="h-8 mr-2 logo-animation" /> {/* Logo */}
+              <span className="text-xl font-bold text-white">env Hub</span> {/* Hotel Name */}
+            </Link>
           </div>
           <div className="flex items-center space-x-4">
             <Link to="/" className="text-gray-300 hover:text-white">Home</Link>

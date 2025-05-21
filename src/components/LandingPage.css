@@ -1,14 +1,42 @@
-.button {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.landing-page {
+  overflow: hidden;
 }
 
-.button:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
-  transition: all 0.2s ease-in-out;
+.animated-heading {
+  animation: fadeInUp 1s ease-out;
+}
+
+.animated-paragraph {
+  animation: fadeInUp 1.5s ease-out;
+}
+
+.animated-button {
+  animation: fadeInUp 2s ease-out;
+}
+
+.feature-card {
+  transition: transform 0.3s ease-in-out;
+}
+
+.feature-card:hover {
+  transform: scale(1.05);
+}
+
+.testimonial-card {
+  transition: transform 0.3s ease-in-out;
+}
+
+.testimonial-card:hover {
+  transform: scale(1.05);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
