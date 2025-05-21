@@ -1,16 +1,27 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../public/images/envHub_logo.png'; // Import the logo
 import './Header.css';
 
 function Header() {
+  const [isAnimating, setIsAnimating] = React.useState(false);
+
+  const handleLogoClick = () => {
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 1000);
+  };
+
   return (
-    <nav className="bg-gray-800 shadow">
+    <nav className="bg-gray-800 shadow hover-effect">
       <div className="container mx-auto py-4 px-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <img src={logo} alt="env Hub Logo" className="h-8 mr-2 logo-animation" /> {/* Logo */}
+              <img 
+                src="/images/env_hub.png" 
+                alt="env Hub Logo" 
+                className={`h-8 mr-2 logo-animation ${isAnimating ? 'animate-bounce' : ''}`}
+                onClick={handleLogoClick}
+              /> {/* Logo */}
               <span className="text-xl font-bold text-white">env Hub</span> {/* Hotel Name */}
             </Link>
           </div>
