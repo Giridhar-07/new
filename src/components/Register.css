@@ -1,4 +1,4 @@
-.login-container {
+.register-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -9,7 +9,7 @@
   padding: 2rem;
 }
 
-.login-form {
+.register-form {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   padding: 3rem;
@@ -17,18 +17,18 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   width: 100%;
-  max-width: 448px;
+  max-width: 500px;
   transform: translateY(0);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   animation: formAppear 0.6s ease-out;
 }
 
-.login-form:hover {
+.register-form:hover {
   transform: translateY(-5px);
   box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3);
 }
 
-.login-title {
+.register-title {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
@@ -39,7 +39,7 @@
   animation: slideDown 0.5s ease-out;
 }
 
-.login-label {
+.register-label {
   display: block;
   font-size: 1rem;
   font-weight: 600;
@@ -50,7 +50,7 @@
   animation: slideDown 0.5s ease-out;
 }
 
-.login-input {
+.register-input {
   width: 100%;
   padding: 1rem;
   border-radius: 1rem;
@@ -62,14 +62,15 @@
   animation: slideUp 0.5s ease-out;
 }
 
-.login-input:focus {
+.register-input:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
   transform: translateY(-2px);
 }
 
-.login-button {
+.register-button {
+  width: 100%;
   background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
   color: white;
   padding: 1rem 2rem;
@@ -77,7 +78,6 @@
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  width: 100%;
   text-align: center;
   display: block;
   border: none;
@@ -87,7 +87,7 @@
   animation: slideUp 0.5s ease-out;
 }
 
-.login-button::before {
+.register-button::before {
   content: '';
   position: absolute;
   top: 0;
@@ -103,17 +103,17 @@
   transition: all 0.5s;
 }
 
-.login-button:hover {
+.register-button:hover {
   transform: translateY(-3px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
   background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
 }
 
-.login-button:hover::before {
+.register-button:hover::before {
   left: 100%;
 }
 
-.login-button:active {
+.register-button:active {
   transform: translateY(0);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
 }

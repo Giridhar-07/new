@@ -1,15 +1,23 @@
+nav {
+  background: rgba(17, 24, 39, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Navigation Links */
 .nav-link {
   position: relative;
   font-weight: 500;
   padding: 0.75rem 1rem;
   transition: all 0.3s ease;
-  color: #fff; /* Set default color to white */
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .nav-link:hover {
-  color: #a3b18a; /* Change color on hover */
-  transform: translateY(-1px);
+  color: #fff;
+  transform: translateY(-2px);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .nav-link::after {
@@ -19,10 +27,10 @@
   height: 2px;
   bottom: 0;
   left: 0;
-  background: #a3b18a; /* Change underline color */
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-link:hover::after {
@@ -32,55 +40,106 @@
 
 /* Auth Buttons */
 .auth-button {
-  padding: 0.75rem 1.5rem; /* Increase padding */
+  padding: 0.75rem 1.75rem;
   font-weight: 600;
-  font-size: 1rem; /* Increase font size */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 0.5rem; /* More rounded corners */
+  font-size: 0.95rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 1rem;
   letter-spacing: 0.025em;
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
+  margin-left: 0.75rem;
+  margin-right: 0.75rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: all 0.6s;
+}
+
+.auth-button:hover::before {
+  left: 100%;
 }
 
 .auth-button.login {
   background: transparent;
-  border: 2px solid #a3b18a; /* Change border color */
-  color: #a3b18a; /* Change text color */
+  border: 2px solid #3b82f6;
+  color: #3b82f6;
+  backdrop-filter: blur(5px);
 }
 
 .auth-button.login:hover {
-  background: #a3b18a; /* Change background color on hover */
-  color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(100, 181, 246, 0.3);
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
 }
 
 .auth-button.register {
-  background: #a3b18a; /* Change background color */
-  color: #fff;
-  border: 2px solid #a3b18a; /* Change border color */
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border: none;
 }
 
 .auth-button.register:hover {
-  background: #73937e; /* Darker shade on hover */
-  border-color: #73937e;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
 }
 
 .auth-button.logout {
   background: transparent;
-  border: 2px solid #EF5350;
-  color: #EF5350;
+  border: 2px solid #ef4444;
+  color: #ef4444;
+  backdrop-filter: blur(5px);
 }
 
 .auth-button.logout:hover {
-  background: #EF5350;
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(239, 83, 80, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(239, 68, 68, 0.2);
 }
 
 /* Hotel Name */
-.flex-shrink-0 {
+.hotel-logo {
+  font-size: 1.75rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.hotel-logo:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* Responsive Menu Animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-appear {
+  animation: slideDown 0.3s ease forwards;
 }

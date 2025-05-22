@@ -43,11 +43,11 @@ function Login() {
   return (
     <main className="login-container">
       <div className="login-form">
-        <h2 className="login-title">Login</h2>
-        <p className="text-gray-600 mb-4 text-center">Login to your account to book your dream hotel.</p>
-        <form onSubmit={handleSubmit}>
+        <h2 className="login-title">Welcome Back</h2>
+        <p className="text-gray-600 mb-8 text-center text-lg">Enter your credentials to access your account</p>
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="mb-4">
-            <label htmlFor="username" className="login-label">Username:</label>
+            <label htmlFor="username" className="login-label">Username</label>
             <input
               type="text"
               id="username"
@@ -58,7 +58,7 @@ function Login() {
             />
           </div>
           <div className="mb-6">
-            <label htmlFor="password" className="login-label">Password:</label>
+            <label htmlFor="password" className="login-label">Password</label>
             <input
               type="password"
               id="password"
