@@ -15,7 +15,7 @@ function Header() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-14">
             {/* Logo and Hotel Name */}
-            <div className="flex-shrink-0">
+            <div>
               <Link to="/" className="group">
                 <span className="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors duration-200">env Hub</span>
               </Link>
@@ -27,7 +27,7 @@ function Header() {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className="nav-link text-gray-300 hover:text-white transition-all duration-200 ease-in-out"
+                  className="nav-link text-gray-300 hover:text-white transition-all duration-200 ease-in-out mr-4"
                 >
                   {item.label}
                 </Link>
@@ -38,11 +38,11 @@ function Header() {
                   <Link to="/register" className="auth-button register">Register</Link>
                 </div>
               ) : (
-                <button 
+                <button
                   onClick={() => {
                     localStorage.removeItem('token');
                     window.location.href = '/login';
-                  }} 
+                  }}
                   className="auth-button logout"
                 >
                   Logout
@@ -54,8 +54,8 @@ function Header() {
 
         </div>
       </nav>
-{/* Spacer to prevent content from being hidden under fixed header */}
-<div className="h-12"></div>
+      {/* Spacer to prevent content from being hidden under fixed header */}
+      <div className="h-12"></div>
     </>
   );
 }

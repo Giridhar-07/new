@@ -2,12 +2,13 @@
 .nav-link {
   position: relative;
   font-weight: 500;
-  padding: 0.5rem 0;
+  padding: 0.75rem 1rem;
   transition: all 0.3s ease;
+  color: #fff; /* Set default color to white */
 }
 
 .nav-link:hover {
-  color: #FFFFFF;
+  color: #a3b18a; /* Change color on hover */
   transform: translateY(-1px);
 }
 
@@ -18,7 +19,7 @@
   height: 2px;
   bottom: 0;
   left: 0;
-  background: #64B5F6;
+  background: #a3b18a; /* Change underline color */
   transform: scaleX(0);
   transform-origin: right;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -31,36 +32,38 @@
 
 /* Auth Buttons */
 .auth-button {
-  padding: 0.5rem 1.25rem;
+  padding: 0.75rem 1.5rem; /* Increase padding */
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 1rem; /* Increase font size */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 9999px;
+  border-radius: 0.5rem; /* More rounded corners */
   letter-spacing: 0.025em;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 .auth-button.login {
   background: transparent;
-  border: 2px solid #64B5F6;
-  color: #64B5F6;
+  border: 2px solid #a3b18a; /* Change border color */
+  color: #a3b18a; /* Change text color */
 }
 
 .auth-button.login:hover {
-  background: #64B5F6;
-  color: white;
+  background: #a3b18a; /* Change background color on hover */
+  color: #fff;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(100, 181, 246, 0.3);
 }
 
 .auth-button.register {
-  background: #64B5F6;
-  color: white;
-  border: 2px solid #64B5F6;
+  background: #a3b18a; /* Change background color */
+  color: #fff;
+  border: 2px solid #a3b18a; /* Change border color */
 }
 
 .auth-button.register:hover {
-  background: #2196F3;
-  border-color: #2196F3;
+  background: #73937e; /* Darker shade on hover */
+  border-color: #73937e;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
 }
@@ -76,4 +79,8 @@
   color: white;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(239, 83, 80, 0.3);
+}
+
+/* Hotel Name */
+.flex-shrink-0 {
 }

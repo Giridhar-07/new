@@ -83,66 +83,65 @@ function LandingPage() {
   ];
 
   return (
-      <div className="relative bg-primary overflow-hidden landing-page" style={{
-        backgroundImage: `url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&q=80&w=2000')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
-      }}>
-        <div className="absolute inset-0 bg-black opacity-60"></div>
-        <div className="container mx-auto px-4 relative z-10 flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <h2 className="text-5xl font-bold text-white mb-4 animated-heading">Experience Hospitality Like Never Before</h2>
-            <p className="text-lg text-gray-300 mb-8 animated-paragraph">Discover unparalleled luxury and personalized service at our exquisite hotel.</p>
-            <Link to="/rooms" className="bg-accent hover:bg-accent-dark text-white font-bold py-3 px-8 rounded-full mt-4 inline-block animated-button">
-              Discover Rooms
-            </Link>
+    <div className="relative bg-primary overflow-hidden landing-page" style={{
+      backgroundImage: `url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&q=80&w=2000')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed'
+    }}>
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black opacity-70"></div>
+      <div className="container mx-auto px-4 relative z-10 flex items-center justify-center min-h-screen">
+        <div className="text-center py-12">
+          <h2 className="text-5xl font-bold text-white mb-6 animated-heading">Experience Hospitality Like Never Before</h2>
+          <p className="text-xl text-gray-300 mb-12 animated-paragraph">Discover unparalleled luxury and personalized service at our exquisite hotel.</p>
+          <Link to="/rooms" className="bg-accent hover:bg-accent-dark text-white font-bold py-4 px-12 rounded-full mt-6 inline-block animated-button">
+            Discover Rooms
+          </Link>
+        </div>
+      </div>
+
+      <section className="py-24 bg-secondary">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-white mb-12 text-center">Hotel Features</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map(feature => (
+              <div key={feature.id} className="text-center">
+                <div className="bg-gray-900 rounded-lg p-6 transform transition-transform hover:scale-105 feature-card">
+                  <img src={feature.image} alt={feature.title} className="w-full h-64 object-cover rounded-lg mb-6 shadow-lg" style={{ objectPosition: 'center' }} />
+                  <h3 className="text-2xl font-semibold text-white mb-4">{feature.title}</h3>
+                  <p className="text-gray-300 text-lg">{feature.description}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
+      </section>
 
-        <section className="py-16 bg-secondary">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-white mb-8 text-center">Hotel Features</h2>
-            <Slider {...settings}>
-              {features.map(feature => (
-                  <div key={feature.id} className="text-center">
-                    <div className="px-4">
-                      <div className="bg-gray-900 rounded-lg p-4 transform transition-transform hover:scale-105 feature-card">
-                        <img src={feature.image} alt={feature.title} className="w-full h-64 object-cover rounded-lg mb-4 shadow-lg" />
-                        <h3 className="text-2xl font-semibold text-white mb-2">{feature.title}</h3>
-                        <p className="text-gray-300 text-lg">{feature.description}</p>
-                      </div>
-                    </div>
+      <section className="py-24 bg-primary">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-white mb-12 text-center">Testimonials</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {testimonials.map(testimonial => (
+              <div key={testimonial.id} className="text-center">
+                <div className="bg-gray-900 rounded-lg p-8 transform transition-transform hover:scale-105 testimonial-card">
+                  <img
+                    src={testimonial.image}
+                    alt={testimonial.author}
+                    className="rounded-full w-24 h-24 mx-auto mb-6 object-cover border-4 border-accent shadow-lg"
+                    style={{ objectPosition: 'center' }}
+                  />
+                  <p className="text-gray-300 italic mb-6 text-lg leading-relaxed">"{testimonial.content}"</p>
+                  <div className="text-center">
+                    <p className="text-white font-semibold text-xl mb-1">{testimonial.author}</p>
+                    <p className="text-accent text-sm">{testimonial.title}</p>
                   </div>
-              ))}
-            </Slider>
+                </div>
+              </div>
+            ))}
           </div>
-        </section>
-
-        <section className="py-16 bg-primary">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-white mb-8 text-center">Testimonials</h2>
-            <Slider {...settings}>
-              {testimonials.map(testimonial => (
-                  <div key={testimonial.id} className="text-center">
-                    <div className="bg-gray-900 rounded-lg p-8 mx-4 transform transition-transform hover:scale-105 testimonial-card">
-                      <img 
-                        src={testimonial.image} 
-                        alt={testimonial.author} 
-                        className="rounded-full w-24 h-24 mx-auto mb-6 object-cover border-4 border-accent shadow-lg" 
-                      />
-                      <p className="text-gray-300 italic mb-6 text-lg leading-relaxed">"{testimonial.content}"</p>
-                      <div className="text-center">
-                        <p className="text-white font-semibold text-xl mb-1">{testimonial.author}</p>
-                        <p className="text-accent text-sm">{testimonial.title}</p>
-                      </div>
-                    </div>
-                  </div>
-              ))}
-            </Slider>
-          </div>
-        </section>
-      </div>
+        </div>
+      </section>
+    </div>
   );
 }
 
