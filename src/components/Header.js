@@ -1,64 +1,70 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import './Header.css';
 
 function Header() {
-  const menuItems = [
-    { path: '/', label: 'Home' },
-    { path: '/rooms', label: 'Rooms' },
-    { path: '/reservations', label: 'Reservations' }
-  ];
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
 
   return (
-    <>
-      <nav className="fixed w-full shadow-lg z-50">
-        <div className="container mx-auto px-6">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo and Hotel Name */}
-            <div className="flex-shrink-0">
-              <Link to="/" className="group">
-                <span className="hotel-logo">env Hub</span>
-              </Link>
-            </div>
+    <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
+      <div className="nav-container">
+        <Link to="/" className="logo">
+          LuxuryStay
+        </Link>
 
-            {/* Center Navigation Menu */}
-            <div className="hidden md:flex items-center space-x-8">
-              {menuItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="nav-link text-gray-300 hover:text-white transition-all duration-200 ease-in-out"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
+        <button
+          className={`mobile-menu-button ${isMobileMenuOpen ? 'open' : ''}`}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span className="mobile-menu-icon"></span>
+        </button>
 
-            {/* Auth Buttons - Right Aligned */}
-            <div className="hidden md:flex items-center ml-auto">
-              {!localStorage.getItem('token') ? (
-                <>
-                  <Link to="/login" className="auth-button login">Login</Link>
-                  <Link to="/register" className="auth-button register">Register</Link>
-                </>
-              ) : (
-                <button
-                  onClick={() => {
-                    localStorage.removeItem('token');
-                    window.location.href = '/login';
-                  }}
-                  className="auth-button logout"
-                >
-                  Logout
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </nav>
-      {/* Spacer to prevent content from being hidden under fixed header */}
-      <div className="h-16"></div>
-    </>
+        <nav className={`nav-links ${isMobileMenuOpen ? 'open' : ''}`}>
+          <Link 
+            to="/" 
+            className={`nav-link ${isActive('/') ? 'active' : ''}`}
+          >
+            Home
+          </Link>
+          <Link 
+            to="/rooms" 
+            className={`nav-link ${isActive('/rooms') ? 'active' : ''}`}
+          >
+            Rooms
+          </Link>
+          <Link 
+            to="/reservations" 
+            className={`nav-link ${isActive('/reservations') ? 'active' : ''}`}
+          >
+            Reservations
+          </Link>
+          {!localStorage.getItem('token') && (
+            <Link 
+              to="/login" 
+              className="nav-link login-nav-link"
+            >
+              Login
+            </Link>
+          )}
+        </nav>
+      </div>
+    </header>
   );
 }
 
