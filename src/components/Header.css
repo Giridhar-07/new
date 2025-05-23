@@ -1,58 +1,133 @@
-nav {
-  background: rgba(17, 24, 39, 0.95) !important;
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Navigation Links */
-.nav-link {
-  position: relative;
-  font-weight: 500;
-  padding: 0.75rem 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.nav-link:hover {
-  color: #fff;
-  transform: translateY(-2px);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.header.scrolled {
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  text-decoration: none;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #1e293b;
+  font-weight: 500;
+  position: relative;
+  padding: 0.5rem 0;
+  transition: all 0.3s ease;
 }
 
 .nav-link::after {
   content: '';
   position: absolute;
-  width: 100%;
-  height: 2px;
   bottom: 0;
   left: 0;
-  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #3b82f6;
 }
 
 .nav-link:hover::after {
-  transform: scaleX(1);
-  transform-origin: left;
+  width: 100%;
 }
 
-/* Auth Buttons */
-.auth-button {
-  padding: 0.75rem 1.75rem;
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 1rem;
-  letter-spacing: 0.025em;
-  margin-left: 0.75rem;
-  margin-right: 0.75rem;
+.nav-link.active {
+  color: #3b82f6;
+}
+
+.nav-link.active::after {
+  width: 100%;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.login-button {
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
   position: relative;
   overflow: hidden;
 }
 
-.auth-button::before {
+.login-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(59, 130, 246, 0.1);
+  transition: all 0.4s ease;
+}
+
+.login-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.login-button:hover::before {
+  left: 100%;
+}
+
+.signup-button {
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: none;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.signup-button::before {
   content: '';
   position: absolute;
   top: 0;
@@ -62,73 +137,98 @@ nav {
   background: linear-gradient(
     120deg,
     transparent,
-    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.3),
     transparent
   );
-  transition: all 0.6s;
+  transition: all 0.4s ease;
 }
 
-.auth-button:hover::before {
+.signup-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.signup-button:hover::before {
   left: 100%;
 }
 
-.auth-button.login {
-  background: transparent;
-  border: 2px solid #3b82f6;
-  color: #3b82f6;
-  backdrop-filter: blur(5px);
-}
-
-.auth-button.login:hover {
-  background: rgba(59, 130, 246, 0.1);
-  color: #60a5fa;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
-}
-
-.auth-button.register {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
+/* Mobile Menu */
+.mobile-menu-button {
+  display: none;
+  background: none;
   border: none;
-}
-
-.auth-button.register:hover {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
-}
-
-.auth-button.logout {
-  background: transparent;
-  border: 2px solid #ef4444;
-  color: #ef4444;
-  backdrop-filter: blur(5px);
-}
-
-.auth-button.logout:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #f87171;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(239, 68, 68, 0.2);
-}
-
-/* Hotel Name */
-.hotel-logo {
-  font-size: 1.75rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #60a5fa, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.hotel-logo:hover {
-  transform: scale(1.05);
-  filter: brightness(1.1);
+.mobile-menu-icon {
+  width: 24px;
+  height: 2px;
+  background: #1e293b;
+  position: relative;
+  transition: all 0.3s ease;
 }
 
-/* Responsive Menu Animation */
+.mobile-menu-icon::before,
+.mobile-menu-icon::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 2px;
+  background: #1e293b;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-icon::before {
+  transform: translateY(-8px);
+}
+
+.mobile-menu-icon::after {
+  transform: translateY(8px);
+}
+
+.mobile-menu-button.open .mobile-menu-icon {
+  background: transparent;
+}
+
+.mobile-menu-button.open .mobile-menu-icon::before {
+  transform: rotate(45deg);
+}
+
+.mobile-menu-button.open .mobile-menu-icon::after {
+  transform: rotate(-45deg);
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+
+  .mobile-menu-button {
+    display: block;
+  }
+
+  .nav-links.open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    padding: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.3s ease-out;
+  }
+
+  .auth-buttons {
+    margin-top: 1rem;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -138,8 +238,4 @@ nav {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.menu-appear {
-  animation: slideDown 0.3s ease forwards;
 }
