@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run tests
+npm test ||
+(
+    echo '❌ Tests failed. Please fix failing tests before pushing.';
+    false;
+)
+
+# Run build
+npm run build ||
+(
+    echo '❌ Build failed. Please fix build errors before pushing.';
+    false;
+)
+
+# Check bundle size
+npx bundlesize ||
+(
+    echo '❌ Bundle size exceeds limit. Please optimize your code.';
+    false;
+)
+
+# Run security checks
+npm audit ||
+(
+    echo '❌ Security vulnerabilities found. Please run npm audit fix.';
+    false;
+)

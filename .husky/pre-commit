@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Fix staged files
+npx lint-staged
+
+# Run type checking
+npm run type-check || 
+(
+    echo '❌ Type check failed. Please fix type errors before committing.';
+    false;
+)
+
+# Check for secrets
+npx secretlint "**/*" ||
+(
+    echo '❌ Secrets detected in code. Please remove any sensitive information.';
+    false;
+)
+
+# Verify dependencies
+npm audit ||
+(
+    echo '❌ Security vulnerabilities found. Please run npm audit fix.';
+    false;
+)
+
+# Add any modified files from formatting
+git add -A

@@ -1,0 +1,66 @@
+# Modern browsers
+last 2 versions
+not dead
+> 0.2%
+
+# Mobile browsers
+iOS >= 13
+Android >= 10
+
+# Desktop browsers
+Chrome >= 89
+Firefox >= 87
+Safari >= 14
+Edge >= 89
+Opera >= 75
+
+# Legacy support (if required by analytics)
+not ie 11
+not op_mini all
+
+# PWA support
+not kaios <= 2.5
+
+# Desktop market share
+> 1% in US
+> 1% in GB
+> 1% in DE
+> 1% in FR
+
+# Security and features
+supports es6-module
+supports woff2
+supports flexbox
+supports css-grid
+
+# Performance targets
+maintained node versions
+
+# Regional considerations
+> 1% in alt-AS
+> 1% in alt-AF
+> 1% in alt-EU
+> 1% in alt-NA
+> 1% in alt-SA
+
+# Special cases
+Firefox ESR
+not IE_Mob <= 11
+
+# Development
+not dead
+
+# Ensure modern features
+supports async-functions
+supports css-variables
+supports custom-elementsv1
+supports shadowdomv1
+supports es6-class
+
+# Accessibility considerations
+not and_uc <= 12.12
+
+# Performance budget
+not op_mob <= 46
+not and_qq <= 10.4
+not baidu <= 7.12

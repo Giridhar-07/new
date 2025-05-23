@@ -1,0 +1,48 @@
+{
+  "files": [
+    {
+      "path": "build/static/js/main.*.js",
+      "maxSize": "200 kB",
+      "compression": "gzip"
+    },
+    {
+      "path": "build/static/js/vendors~main.*.js",
+      "maxSize": "250 kB",
+      "compression": "gzip"
+    },
+    {
+      "path": "build/static/css/main.*.css",
+      "maxSize": "50 kB",
+      "compression": "gzip"
+    },
+    {
+      "path": "build/static/media/*.{png,jpg,gif,svg}",
+      "maxSize": "100 kB"
+    },
+    {
+      "path": "build/static/js/runtime-main.*.js",
+      "maxSize": "10 kB",
+      "compression": "gzip"
+    },
+    {
+      "path": "build/static/js/*.chunk.js",
+      "maxSize": "100 kB",
+      "compression": "gzip"
+    }
+  ],
+  "ci": {
+    "trackBranches": ["main", "develop"],
+    "baseContext": "main",
+    "trackDiffs": true,
+    "failOnDiffIncrease": true,
+    "diffThreshold": "5%"
+  },
+  "compression": {
+    "brotli": true,
+    "gzip": true
+  },
+  "reportOutput": [
+    "github",
+    "cli"
+  ]
+}

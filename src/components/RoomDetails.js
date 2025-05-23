@@ -1,69 +1,77 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { 
+  FaBed, 
+  FaUsers, 
+  FaWifi, 
+  FaTv, 
+  FaSnowflake, 
+  FaParking,
+  FaCalendarAlt,
+  FaArrowRight
+} from 'react-icons/fa';
 import './RoomDetails.css';
 
 function RoomDetails() {
-  const [room, setRoom] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const { id } = useParams();
   const navigate = useNavigate();
+  const [room, setRoom] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [bookingDates, setBookingDates] = useState({
+    checkIn: '',
+    checkOut: '',
+    guests: 1
+  });
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setError('You must be logged in to view room details.');
-      setLoading(false);
-      return;
-    }
-
-    fetch(`http://127.0.0.1:8000/api/rooms/${id}/`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch room details');
-        }
-        return response.json();
-      })
-      .then(data => {
-        setRoom(data);
-        setError('');
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        setError(error.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    fetchRoomDetails();
   }, [id]);
 
-  const handleBooking = () => {
-    // Navigate to booking page
-    navigate(`/booking/${id}`);
+  const fetchRoomDetails = async () => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/rooms/${id}/`);
+      if (response.ok) {
+        const data = await response.json();
+        setRoom(data);
+      }
+    } catch (error) {
+      console.error('Error fetching room details:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBookingSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://127.0.0.1:8000/api/reservations/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          room_id: id,
+          check_in_date: bookingDates.checkIn,
+          check_out_date: bookingDates.checkOut,
+          guest_count: bookingDates.guests
+        })
+      });
+
+      if (response.ok) {
+        navigate('/reservations');
+      }
+    } catch (error) {
+      console.error('Error creating reservation:', error);
+    }
   };
 
   if (loading) {
     return (
       <div className="room-details-container">
-        <div className="room-details-card">
-          <div className="loading-spinner">
-            Loading room details...
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="room-details-container">
-        <div className="error-message">
-          {error}
-        </div>
+        <div className="loading-indicator">Loading...</div>
       </div>
     );
   }
@@ -71,72 +79,114 @@ function RoomDetails() {
   if (!room) {
     return (
       <div className="room-details-container">
-        <div className="error-message">
-          Room not found
-        </div>
+        <div className="error-message">Room not found</div>
       </div>
     );
   }
 
+  const amenities = [
+    { icon: <FaBed />, name: 'King Size Bed' },
+    { icon: <FaUsers />, name: `Fits ${room.capacity} Guests` },
+    { icon: <FaWifi />, name: 'Free Wi-Fi' },
+    { icon: <FaTv />, name: 'Smart TV' },
+    { icon: <FaSnowflake />, name: 'Air Conditioning' },
+    { icon: <FaParking />, name: 'Free Parking' }
+  ];
+
   return (
     <div className="room-details-container">
-      <div className="room-details-card">
-        <div className="room-details-header">
-          <h1 className="room-details-title">{room.name}</h1>
-          <p className="room-details-subtitle">Experience luxury and comfort</p>
-        </div>
-
-        <div className="room-details-content">
-          <div className="room-details-image-container">
-            <img 
-              src={room.image} 
-              alt={room.name} 
+      <div className="room-details-content">
+        <div className="room-details-card">
+          <div className="room-details-header">
+            <img
+              src={room.image || '/images/default-room.jpg'}
+              alt={room.name}
               className="room-details-image"
             />
+            <div className="header-overlay">
+              <h1 className="room-details-title">{room.name}</h1>
+              <div className="room-details-price">
+                <span className="price-amount">${room.price}</span>
+                <span>per night</span>
+              </div>
+            </div>
           </div>
 
-          <div className="room-details-info">
-            <p className="room-details-description">
-              {room.description}
-            </p>
+          <div className="room-details-body">
+            <div className="details-section">
+              <h2 className="section-title">Description</h2>
+              <p className="room-description">{room.description}</p>
+            </div>
 
-            <div className="room-details-features">
-              <div className="feature-item">
-                <span className="feature-icon">🛏️</span>
-                <span>Comfortable Beds</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">🚿</span>
-                <span>Private Bathroom</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">📺</span>
-                <span>Smart TV</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">❄️</span>
-                <span>Air Conditioning</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">📶</span>
-                <span>Free Wi-Fi</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">🗄️</span>
-                <span>Mini Bar</span>
+            <div className="details-section">
+              <h2 className="section-title">Amenities</h2>
+              <div className="amenities-grid">
+                {amenities.map((amenity, index) => (
+                  <div key={index} className="amenity-item">
+                    <span className="amenity-icon">{amenity.icon}</span>
+                    <span className="amenity-text">{amenity.name}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="room-price">
-              ${room.price} per night
-            </div>
+            <div className="booking-section">
+              <h2 className="section-title">Book Now</h2>
+              <form onSubmit={handleBookingSubmit} className="booking-form">
+                <div className="form-group">
+                  <label className="form-label">Check-in Date</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    value={bookingDates.checkIn}
+                    onChange={(e) => setBookingDates(prev => ({
+                      ...prev,
+                      checkIn: e.target.value
+                    }))}
+                    required
+                  />
+                </div>
 
-            <button 
-              onClick={handleBooking}
-              className="book-now-button"
-            >
-              Book Now
-            </button>
+                <div className="form-group">
+                  <label className="form-label">Check-out Date</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    value={bookingDates.checkOut}
+                    onChange={(e) => setBookingDates(prev => ({
+                      ...prev,
+                      checkOut: e.target.value
+                    }))}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Number of Guests</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={bookingDates.guests}
+                    onChange={(e) => setBookingDates(prev => ({
+                      ...prev,
+                      guests: parseInt(e.target.value)
+                    }))}
+                    min="1"
+                    max={room.capacity}
+                    required
+                  />
+                </div>
+
+                <button type="submit" className="book-now-button">
+                  <span>Book Now</span>
+                  <FaArrowRight />
+                </button>
+              </form>
+
+              <span className={`availability-label ${room.is_available ? 'available' : 'unavailable'}`}>
+                {room.is_available ? 'Available' : 'Currently Unavailable'}
+              </span>
+            </div>
           </div>
         </div>
       </div>

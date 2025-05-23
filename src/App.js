@@ -1,30 +1,129 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header';
-import LandingPage from './components/LandingPage';
+import Sidebar from './components/Sidebar';
+import Dashboard from './components/Dashboard';
+import Rooms from './components/Rooms';
+import RoomDetails from './components/RoomDetails';
+import Reservations from './components/Reservations';
+import Customers from './components/Customers';
 import Login from './components/Login';
 import Register from './components/Register';
-import Rooms from './components/Rooms';
-import Reservations from './components/Reservations';
-import RoomDetails from './components/RoomDetails';
+import LandingPage from './components/LandingPage';
 import Chatbot from './components/Chatbot';
 import './App.css';
 
 function App() {
-  const token = localStorage.getItem('token');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check authentication status
+    const checkAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const response = await fetch('http://127.0.0.1:8000/api/verify-token/', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          setIsAuthenticated(response.ok);
+        } catch (error) {
+          console.error('Auth check failed:', error);
+          setIsAuthenticated(false);
+        }
+      } else {
+        setIsAuthenticated(false);
+      }
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, []);
+
+  if (isLoading) {
+    return <div className="loading-screen">Loading...</div>;
+  }
+
+  // Protected Route Component
+  const ProtectedRoute = ({ children }) => {
+    if (!isAuthenticated) {
+      return <Navigate to="/login" />;
+    }
+    return children;
+  };
+
+  // Layout Component
+  const DashboardLayout = ({ children }) => {
+    return (
+      <div className="dashboard-layout">
+        <Sidebar />
+        <div className="main-content">
+          {children}
+        </div>
+        <Chatbot />
+      </div>
+    );
+  };
 
   return (
     <Router>
-      <Header />
-      <Routes>
-        <Route path="/" element={token ? <LandingPage /> : <Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/rooms" element={<Rooms />} />
-        <Route path="/reservations" element={token ? <Reservations /> : <Navigate to="/login" />} />
-        <Route path="/room/:id" element={token ? <RoomDetails /> : <Navigate to="/login" />} />
-      </Routes>
-      <Chatbot/>
+      <div className="app">
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={
+            <>
+              <Header />
+              <LandingPage />
+              <Chatbot />
+            </>
+          } />
+          <Route path="/login" element={
+            !isAuthenticated ? <Login setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/dashboard" />
+          } />
+          <Route path="/register" element={
+            !isAuthenticated ? <Register setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/dashboard" />
+          } />
+
+          {/* Protected Routes */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Dashboard />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/rooms" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Rooms />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/rooms/:id" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <RoomDetails />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/reservations" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Reservations />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/customers" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Customers />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+        </Routes>
+      </div>
     </Router>
   );
 }

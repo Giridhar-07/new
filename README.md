@@ -1,70 +1,174 @@
-# Getting Started with Create React App
+# LuxuryStay Hotel Management System - Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Modern and elegant hotel management system built with React, TypeScript, and modern web technologies.
 
-## Available Scripts
+## 🌟 Features
 
-In the project directory, you can run:
+- 🏨 Complete hotel management solution
+- 🔐 Secure authentication system
+- 📱 Responsive design for all devices
+- 🤖 AI-powered chatbot assistant
+- 🎨 Modern UI with smooth animations
+- 🏷️ Real-time room availability
+- 📊 Interactive dashboards
+- 🌐 3D room previews
+- 🔄 Seamless reservation system
+- 💳 Integrated payment processing
 
-### `npm start`
+## 🚀 Quick Start
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Prerequisites
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+- Git
 
-### `npm test`
+### Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/luxurystay-frontend.git
+cd luxurystay-frontend
+```
 
-### `npm run build`
+2. Install dependencies:
+```bash
+npm install
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. Create environment file:
+```bash
+cp .env.example .env
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. Start the development server:
+```bash
+npm start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The application will be available at `http://localhost:3000`
 
-### `npm run eject`
+## 🛠️ Technology Stack
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- **Framework:** React 18
+- **Language:** TypeScript
+- **Styling:** CSS Modules, SCSS
+- **State Management:** React Context
+- **API Client:** Axios
+- **3D Rendering:** Three.js
+- **UI Components:** Custom components
+- **Form Handling:** React Hook Form
+- **Validation:** Yup
+- **Testing:** Jest, React Testing Library
+- **Linting:** ESLint, Prettier
+- **Build Tool:** Create React App
+- **CI/CD:** GitHub Actions
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 📁 Project Structure
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
+src/
+├── components/         # React components
+├── hooks/             # Custom React hooks
+├── services/          # API and external services
+├── contexts/          # React contexts
+├── lib/              # Utility functions
+├── types/            # TypeScript type definitions
+├── assets/           # Static assets
+└── styles/           # Global styles
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🔧 Configuration
 
-## Learn More
+Key configuration files:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- `.env` - Environment variables
+- `.eslintrc.json` - ESLint configuration
+- `.prettierrc` - Prettier configuration
+- `tsconfig.json` - TypeScript configuration
+- `package.json` - Project dependencies and scripts
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 📝 Available Scripts
 
-### Code Splitting
+- `npm start` - Start development server
+- `npm build` - Create production build
+- `npm test` - Run tests
+- `npm run lint` - Check code style
+- `npm run format` - Format code
+- `npm run type-check` - Check TypeScript types
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 🧪 Testing
 
-### Analyzing the Bundle Size
+Run tests with:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+npm test
+```
 
-### Making a Progressive Web App
+Run tests with coverage:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+npm test -- --coverage
+```
 
-### Advanced Configuration
+## 📱 Responsive Design
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+The application is responsive across devices:
 
-### Deployment
+- 📱 Mobile: 320px and up
+- 📱 Tablet: 768px and up
+- 💻 Desktop: 1024px and up
+- 🖥️ Large Desktop: 1440px and up
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 🔒 Security
 
-### `npm run build` fails to minify
+- JWT authentication
+- HTTP-only cookies
+- CSRF protection
+- Rate limiting
+- Input validation
+- XSS prevention
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 🎨 Design System
+
+- Consistent color palette
+- Typography scale
+- Spacing system
+- Component library
+- Animation guidelines
+- Accessibility patterns
+
+## 🌐 Browser Support
+
+- Chrome (last 2 versions)
+- Firefox (last 2 versions)
+- Safari (last 2 versions)
+- Edge (last 2 versions)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to your branch
+5. Create a pull request
+
+## 📜 License
+
+MIT License - see LICENSE file for details
+
+## 👥 Team
+
+- Frontend Lead: [Your Name]
+- UI/UX Designer: [Designer Name]
+- Backend Lead: [Backend Dev Name]
+
+## 📞 Support
+
+For support, email support@luxurystay.com or join our Slack channel.
+
+## 🙏 Acknowledgments
+
+- React Team
+- Three.js Community
+- Open Source Contributors

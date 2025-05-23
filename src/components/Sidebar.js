@@ -1,15 +1,128 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { 
+  FaHome, 
+  FaBed, 
+  FaCalendarAlt, 
+  FaUsers, 
+  FaChartBar,
+  FaCog,
+  FaBars
+} from 'react-icons/fa';
+import './Sidebar.css';
 
 function Sidebar() {
+  const [isOpen, setIsOpen] = useState(true);
+  const [userData, setUserData] = useState({
+    name: 'Admin User',
+    role: 'Hotel Manager',
+    avatar: 'https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff'
+  });
+  const location = useLocation();
+
+  useEffect(() => {
+    // Fetch user data
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://127.0.0.1:8000/api/user-profile/', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserData({
+            name: `${data.first_name} ${data.last_name}`,
+            role: data.role || 'Hotel Staff',
+            avatar: data.avatar || `https://ui-avatars.com/api/?name=${data.first_name}+${data.last_name}&background=3b82f6&color=fff`
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const navigationItems = [
+    {
+      section: 'Main',
+      items: [
+        { path: '/dashboard', icon: <FaHome />, text: 'Dashboard' },
+        { path: '/rooms', icon: <FaBed />, text: 'Rooms', badge: '12' },
+        { path: '/reservations', icon: <FaCalendarAlt />, text: 'Reservations', badge: '5' }
+      ]
+    },
+    {
+      section: 'Management',
+      items: [
+        { path: '/customers', icon: <FaUsers />, text: 'Customers' },
+        { path: '/analytics', icon: <FaChartBar />, text: 'Analytics' },
+        { path: '/settings', icon: <FaCog />, text: 'Settings' }
+      ]
+    }
+  ];
+
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <aside style={{ backgroundColor: '#f0f0f0', padding: '10px', width: '200px' }}>
-      <ul>
-        <li><a href="/">Dashboard</a></li>
-        <li><a href="/rooms">Rooms</a></li>
-        <li><a href="/reservations">Reservations</a></li>
-        <li><a href="/customers">Customers</a></li>
-      </ul>
-    </aside>
+    <>
+      <button
+        className="toggle-button"
+        onClick={toggleSidebar}
+        aria-label="Toggle Sidebar"
+      >
+        <FaBars />
+      </button>
+
+      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <h1 className="sidebar-logo">LuxuryStay</h1>
+        </div>
+
+        <nav className="nav-menu">
+          {navigationItems.map((section, idx) => (
+            <div key={idx} className="nav-section">
+              <div className="nav-section-title">{section.section}</div>
+              {section.items.map((item, itemIdx) => (
+                <NavLink
+                  key={itemIdx}
+                  to={item.path}
+                  className={({ isActive }) => 
+                    `nav-item ${isActive ? 'active' : ''}`
+                  }
+                >
+                  <span className="nav-icon">{item.icon}</span>
+                  <span className="nav-text">{item.text}</span>
+                  {item.badge && (
+                    <span className="nav-badge">{item.badge}</span>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          ))}
+        </nav>
+
+        <div className="user-section">
+          <div className="user-profile">
+            <img
+              src={userData.avatar}
+              alt={userData.name}
+              className="user-avatar"
+            />
+            <div className="user-info">
+              <div className="user-name">{userData.name}</div>
+              <div className="user-role">{userData.role}</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }
 

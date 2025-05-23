@@ -1,0 +1,96 @@
+version: 2
+updates:
+  # Maintain dependencies for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "security"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore(dev)"
+      include: "scope"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "team-frontend"
+    assignees:
+      - "team-frontend"
+    groups:
+      react:
+        patterns:
+          - "react*"
+          - "@types/react*"
+      typescript:
+        patterns:
+          - "typescript"
+          - "@types/*"
+      testing:
+        patterns:
+          - "jest*"
+          - "@testing-library/*"
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react*"
+        update-types: ["version-update:semver-major"]
+
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "team-devops"
+
+  # Security updates
+  security-updates:
+    labels:
+      - "dependencies"
+      - "security"
+    milestone: "Security Patches"
+    priority: "high"
+
+  # Version updates settings
+  version-updates:
+    labels:
+      - "dependencies"
+      - "version-update"
+    milestone: "Next Release"
+
+  # Pull request settings
+  pull-request-branch-name:
+    separator: "-"
+    
+  # Vulnerability alerts
+  vulnerability-alerts:
+    enabled: true
+    labels:
+      - "security"
+      - "vulnerability"
+    milestone: "Security Fixes"
+    priority: "critical"
+
+  # Update strategy
+  update-strategy:
+    rebase-strategy: "auto"
+    auto-merge: false
+    require-review: true
+
+  # Target branch
+  target-branch: "develop"

@@ -1,115 +1,127 @@
-const API_KEY = 'AIzaSyDHF9zvQcjeqhlV2HArbq5cm8cFmxa5Gt8'; // Replace with your actual API key
+const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
 const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
 
-const systemPrompt = `You are a helpful hotel assistant. You can:
-1. Answer questions about hotel amenities, services, and policies
-2. Help with room bookings
-3. Provide information about room types and availability
-4. Assist with special requests
-5. Guide users through the booking process
+const systemContext = `You are a helpful hotel assistant for LuxuryStay Hotel. Your role is to:
+- Provide information about hotel amenities and services
+- Help with room bookings and reservations
+- Answer questions about hotel policies
+- Provide local area information and recommendations
+- Assist with special requests and requirements
+- Maintain a professional, friendly, and helpful tone
+- Keep responses concise but informative
+- If you can't help with something, direct users to contact hotel staff
 
-Hotel Information:
-- Room types: Standard, Deluxe, Suite
-- Amenities: Pool, Spa, Restaurant, Gym, WiFi
-- Check-in: 2 PM, Check-out: 11 AM
-- Booking requires: Name, Email, Check-in/out dates, Room type
+You have access to this basic information:
+- Hotel Name: LuxuryStay Hotel
+- Room Types: Standard, Deluxe, and Suite
+- Amenities: Pool, Spa, Gym, Restaurant, Free WiFi, Parking
+- Check-in: 3 PM, Check-out: 11 AM
+- Location: City Center
 `;
 
-class GeminiService {
-  async generateResponse(userMessage) {
-    try {
-      const response = await fetch(`${API_URL}?key=${API_KEY}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+export const sendMessageToGemini = async (message) => {
+  try {
+    const response = await fetch(`${API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              {
+                text: `${systemContext}\n\nUser message: ${message}`
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
         },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: `${systemPrompt}\n\nUser: ${userMessage}` }]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
+        safetySettings: [
+          {
+            category: 'HARM_CATEGORY_HARASSMENT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
           },
-          safetySettings: [
-            {
-              category: 'HARM_CATEGORY_HARASSMENT',
-              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-            },
-            {
-              category: 'HARM_CATEGORY_HATE_SPEECH',
-              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-            }
-          ]
-        })
-      });
+          {
+            category: 'HARM_CATEGORY_HATE_SPEECH',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          },
+          {
+            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          },
+          {
+            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          }
+        ]
+      })
+    });
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error?.message || 'Failed to get response from Gemini');
-      }
-
-      return data.candidates[0].content.parts[0].text;
-    } catch (error) {
-      console.error('Gemini API Error:', error);
-      throw error;
+    if (!response.ok) {
+      throw new Error('Failed to get response from Gemini');
     }
-  }
 
-  async processBookingIntent(userMessage) {
-    try {
-      // Enhanced prompt for booking-related queries
-      const bookingPrompt = `${systemPrompt}
-      
-Task: Analyze if this is a booking request and extract booking details if present.
-User message: ${userMessage}
-
-Respond in JSON format:
-{
-  "isBookingRequest": boolean,
-  "extractedDetails": {
-    "dates": {
-      "checkIn": "YYYY-MM-DD or null",
-      "checkOut": "YYYY-MM-DD or null"
-    },
-    "roomType": "standard/deluxe/suite or null",
-    "guestCount": number or null,
-    "specialRequests": "string or null"
-  },
-  "missingInfo": ["list of required missing information"],
-  "response": "your response to the user"
-}`;
-
-      const response = await this.generateResponse(bookingPrompt);
-      return JSON.parse(response);
-    } catch (error) {
-      console.error('Booking Processing Error:', error);
-      throw error;
+    const data = await response.json();
+    
+    if (!data.candidates || data.candidates.length === 0) {
+      throw new Error('No response generated');
     }
+
+    const responseText = data.candidates[0].content.parts[0].text;
+    return formatResponse(responseText);
+  } catch (error) {
+    console.error('Error calling Gemini API:', error);
+    throw error;
   }
+};
 
-  async handleFollowUp(conversation, userMessage) {
-    try {
-      const conversationPrompt = `${systemPrompt}
-Previous conversation:
-${conversation.map(msg => `${msg.sender}: ${msg.text}`).join('\n')}
+const formatResponse = (text) => {
+  // Remove any system context that might have been included
+  text = text.replace(systemContext, '').trim();
+  
+  // Remove any "User message:" prefix that might be in the response
+  text = text.replace(/^User message:.*$/m, '').trim();
+  
+  // Clean up any extra whitespace or newlines
+  text = text.replace(/\n{3,}/g, '\n\n').trim();
+  
+  return text;
+};
 
-Current user message: ${userMessage}
+// Helper function to check if the API key is configured
+export const isGeminiConfigured = () => {
+  return Boolean(GEMINI_API_KEY);
+};
 
-Analyze the conversation context and provide a relevant response.`;
-
-      return await this.generateResponse(conversationPrompt);
-    } catch (error) {
-      console.error('Follow-up Processing Error:', error);
-      throw error;
-    }
+// Function to handle API errors
+export const handleGeminiError = (error) => {
+  if (error.message.includes('API key')) {
+    return 'The AI service is not properly configured. Please contact support.';
   }
-}
+  
+  if (error.message.includes('rate limit')) {
+    return 'The service is experiencing high traffic. Please try again in a moment.';
+  }
+  
+  return 'I apologize, but I\'m having trouble processing your request. Please try again.';
+};
 
-export default new GeminiService();
+// Function to validate messages before sending
+export const validateMessage = (message) => {
+  if (!message || message.trim().length === 0) {
+    throw new Error('Message cannot be empty');
+  }
+  
+  if (message.length > 500) {
+    throw new Error('Message is too long. Please keep it under 500 characters.');
+  }
+  
+  return message.trim();
+};
