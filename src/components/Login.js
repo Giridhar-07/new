@@ -1,83 +1,97 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
 
 function Login() {
-  console.log('Login component rendered');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    console.log('Login form submitted');
-    console.log('Username:', username, 'Password:', password);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/login/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ email, password }),
       });
 
-      console.log('Login API response status:', response.status);
       const data = await response.json();
-      console.log('Login API response data:', data);
 
       if (response.ok) {
-        console.log('Login successful, storing token:', data.access);
-        localStorage.setItem('token', data.access);
-        // Redirect to the home page or another protected route
-        window.location.href = '/rooms';
+        localStorage.setItem('token', data.token);
+        navigate('/dashboard');
       } else {
-        console.error('Login failed:', data.error);
-        // Display an error message
-        alert(data.error);
+        setError(data.error || 'Login failed. Please check your credentials.');
       }
     } catch (error) {
-      console.error('Error during login fetch:', error);
-      alert('An error occurred during login.');
+      setError('An error occurred. Please try again later.');
     }
   };
 
   return (
-    <main className="login-container">
-      <div className="login-form">
-        <h2 className="login-title">Welcome Back</h2>
-        <p className="text-gray-600 mb-8 text-center text-lg">Enter your credentials to access your account</p>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="mb-4">
-            <label htmlFor="username" className="login-label">Username</label>
+    <div className="login-container">
+      <div className="background-shapes">
+        <div className="shape"></div>
+        <div className="shape"></div>
+        <div className="shape"></div>
+      </div>
+      
+      <div className="login-form-container">
+        <form onSubmit={handleSubmit} className="login-form">
+          <h2 className="login-title">Welcome Back</h2>
+          <p className="login-subtitle">Enter your credentials to access your account</p>
+
+          {error && <div className="error-message">{error}</div>}
+
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">
+              Email Address
+            </label>
             <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="login-input"
-              placeholder="Enter your username"
+              type="email"
+              id="email"
+              className="form-control"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
             />
           </div>
-          <div className="mb-6">
-            <label htmlFor="password" className="login-label">Password</label>
+
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
             <input
               type="password"
               id="password"
+              className="form-control"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="login-input"
               placeholder="Enter your password"
+              required
             />
           </div>
-          <button
-            type="submit"
-            className="login-button"
-            onClick={() => console.log('Login button clicked')}
-          >
-            Login
+
+          <button type="submit" className="submit-button">
+            Sign In
           </button>
+
+          <div className="form-footer">
+            Don't have an account?{' '}
+            <Link to="/register" className="register-link">
+              Register Now
+            </Link>
+          </div>
         </form>
       </div>
-    </main>
+    </div>
   );
 }
 

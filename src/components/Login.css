@@ -90,6 +90,60 @@
 .form-group {
   margin-bottom: 1.5rem;
   position: relative;
+  animation: inputSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+}
+
+.form-control {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 1rem;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.15);
+}
+
+.form-group:focus-within .form-label {
+  color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.submit-button {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  animation: buttonSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s backwards;
+}
+
+.submit-button::before {
+  content: '';
+  position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
@@ -97,31 +151,83 @@
   background: linear-gradient(
     120deg,
     transparent,
-    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.3),
     transparent
   );
   transition: all 0.5s;
 }
 
-.login-button:hover {
+.submit-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+  box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.4);
 }
 
-.login-button:hover::before {
+.submit-button:hover::before {
   left: 100%;
 }
 
-.login-button:active {
-  transform: translateY(0);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+.submit-button:active {
+  transform: translateY(-1px);
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: 2rem;
+  animation: footerSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
+}
+
+.register-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.register-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  transition: width 0.3s ease;
+}
+
+.register-link:hover::after {
+  width: 100%;
+}
+
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  animation: errorShake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  transform: translateX(0);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(50px, -50px);
+  }
+  50% {
+    transform: translate(0, -100px);
+  }
+  75% {
+    transform: translate(-50px, -50px);
+  }
 }
 
 @keyframes formAppear {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(40px);
   }
   to {
     opacity: 1;
@@ -129,7 +235,7 @@
   }
 }
 
-@keyframes slideDown {
+@keyframes titleSlide {
   from {
     opacity: 0;
     transform: translateY(-20px);
@@ -140,7 +246,7 @@
   }
 }
 
-@keyframes slideUp {
+@keyframes subtitleSlide {
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -148,5 +254,53 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes inputSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes buttonSlide {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes footerSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes errorShake {
+  10%, 90% {
+    transform: translateX(-1px);
+  }
+  20%, 80% {
+    transform: translateX(2px);
+  }
+  30%, 50%, 70% {
+    transform: translateX(-4px);
+  }
+  40%, 60% {
+    transform: translateX(4px);
   }
 }
