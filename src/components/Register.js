@@ -52,7 +52,8 @@ function Register() {
 
       if (response.ok) {
         // Automatically log in the user and redirect
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('access_token', data.access);
+        localStorage.setItem('refresh_token', data.refresh);
         navigate('/dashboard');
       } else {
         setError(data.error || 'Registration failed. Please try again.');
@@ -124,6 +125,7 @@ function Register() {
                 onChange={handleChange}
                 required
                 placeholder="Enter your email"
+                autoComplete="username"
               />
             </div>
 
@@ -156,6 +158,7 @@ function Register() {
                 onChange={handleChange}
                 required
                 placeholder="Create a password"
+                autoComplete="new-password"
               />
             </div>
 
@@ -172,6 +175,7 @@ function Register() {
                 onChange={handleChange}
                 required
                 placeholder="Confirm your password"
+                autoComplete="new-password"
               />
             </div>
           </div>

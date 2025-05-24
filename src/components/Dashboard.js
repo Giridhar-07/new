@@ -6,7 +6,7 @@ function Dashboard() {
   const [stats, setStats] = useState({
     totalBookings: 0,
     activeBookings: 0,
-    revenue: 0
+    revenue: 0,
   });
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,11 +15,11 @@ function Dashboard() {
     // Fetch dashboard data
     const fetchDashboardData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('access_token');
         const response = await fetch('http://127.0.0.1:8000/api/dashboard/', {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         if (response.ok) {
@@ -27,7 +27,7 @@ function Dashboard() {
           setStats({
             totalBookings: data.total_bookings || 0,
             activeBookings: data.active_bookings || 0,
-            revenue: data.total_revenue || 0
+            revenue: data.total_revenue || 0,
           });
           setActivities(data.recent_activities || []);
         }
@@ -105,7 +105,9 @@ function Dashboard() {
                 </div>
                 <div className="activity-details">
                   <div className="activity-title">{activity.title}</div>
-                  <div className="activity-time">{new Date(activity.timestamp).toLocaleDateString()}</div>
+                  <div className="activity-time">
+                    {new Date(activity.timestamp).toLocaleDateString()}
+                  </div>
                 </div>
                 <span className={`activity-status status-${activity.status}`}>
                   {activity.status}
