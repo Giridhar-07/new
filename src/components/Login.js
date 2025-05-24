@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
 
@@ -18,18 +19,21 @@ function Login() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          username: email,
+          password,
+        }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('token', data.access);
         navigate('/dashboard');
       } else {
         setError(data.error || 'Login failed. Please check your credentials.');
       }
-    } catch (error) {
+    } catch (err) {
       setError('An error occurred. Please try again later.');
     }
   };
@@ -41,7 +45,6 @@ function Login() {
         <div className="shape"></div>
         <div className="shape"></div>
       </div>
-      
       <div className="login-form-container">
         <form onSubmit={handleSubmit} className="login-form">
           <h2 className="login-title">Welcome Back</h2>
@@ -84,7 +87,7 @@ function Login() {
           </button>
 
           <div className="form-footer">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link to="/register" className="register-link">
               Register Now
             </Link>

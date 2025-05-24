@@ -9,16 +9,16 @@ function Register() {
     email: '',
     phone: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -39,9 +39,12 @@ function Register() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: formData.firstName + ' ' + formData.lastName,
+          username: formData.email, // Using email as username for uniqueness
           email: formData.email,
-          password: formData.password
+          password: formData.password,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          phone: formData.phone,
         }),
       });
 
@@ -54,7 +57,7 @@ function Register() {
       } else {
         setError(data.error || 'Registration failed. Please try again.');
       }
-    } catch (error) {
+    } catch (err) {
       setError('An error occurred. Please try again later.');
     }
   };
