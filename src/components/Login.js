@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
 
-function Login() {
+function Login({ setIsAuthenticated }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -30,6 +30,9 @@ function Login() {
       if (response.ok) {
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
+        localStorage.setItem('user_id', data.user_id);
+        localStorage.setItem('customer_id', data.customer_id);
+        setIsAuthenticated(true);
         navigate('/dashboard');
       } else {
         setError(data.error || 'Login failed. Please check your credentials.');
