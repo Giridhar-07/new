@@ -40,13 +40,19 @@ function Rooms() {
         url += `?${params.toString()}`;
       }
 
-      const response = await fetch(url);
+      const token = localStorage.getItem('access_token');
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setRooms(data);
       }
     } catch (error) {
       console.error('Error fetching rooms:', error);
+      setRooms([]);
     } finally {
       setLoading(false);
     }

@@ -7,6 +7,7 @@ import Rooms from './components/Rooms';
 import RoomDetails from './components/RoomDetails';
 import Reservations from './components/Reservations';
 import Customers from './components/Customers';
+import Analytics from './components/Analytics';
 import Login from './components/Login';
 import Register from './components/Register';
 import LandingPage from './components/LandingPage';
@@ -74,7 +75,7 @@ function App() {
   const DashboardLayout = ({ children }) => {
     return (
       <div className="dashboard-layout">
-        <Sidebar />
+        <Sidebar setIsAuthenticated={setIsAuthenticated} />
         <div className="main-content">
           {children}
         </div>
@@ -135,6 +136,13 @@ function App() {
             <ProtectedRoute>
               <DashboardLayout>
                 <Customers />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/analytics" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Analytics />
               </DashboardLayout>
             </ProtectedRoute>
           } />

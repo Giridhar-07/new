@@ -7,11 +7,12 @@ import {
   FaUsers, 
   FaChartBar,
   FaCog,
-  FaBars
+  FaBars,
+  FaSignOutAlt
 } from 'react-icons/fa';
 import './Sidebar.css';
 
-function Sidebar() {
+function Sidebar({ setIsAuthenticated }) {
   const [isOpen, setIsOpen] = useState(true);
   const [userData, setUserData] = useState({
     name: 'Admin User',
@@ -24,7 +25,7 @@ function Sidebar() {
     // Fetch user data
     const fetchUserData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('access_token');
         const response = await fetch('http://127.0.0.1:8000/api/user-profile/', {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -61,8 +62,8 @@ function Sidebar() {
       items: [
         { path: '/customers', icon: <FaUsers />, text: 'Customers' },
         { path: '/analytics', icon: <FaChartBar />, text: 'Analytics' },
-        { path: '/settings', icon: <FaCog />, text: 'Settings' }
-      ]
+        { path: '/settings', icon: <FaCog />, text: 'Settings' },
+      ],
     }
   ];
 
@@ -120,6 +121,19 @@ function Sidebar() {
               <div className="user-role">{userData.role}</div>
             </div>
           </div>
+          <button 
+            className="logout-button"
+            onClick={() => {
+              localStorage.removeItem('access_token');
+              localStorage.removeItem('refresh_token');
+              localStorage.removeItem('user_id');
+              localStorage.removeItem('customer_id');
+              setIsAuthenticated(false);
+              window.location.href = '/login';
+            }}
+          >
+            <FaSignOutAlt /> Logout
+          </button>
         </div>
       </aside>
     </>

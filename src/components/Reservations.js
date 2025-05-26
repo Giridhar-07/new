@@ -16,7 +16,7 @@ function Reservations() {
 
   const fetchReservations = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('access_token');
       const response = await fetch('http://127.0.0.1:8000/api/reservations/', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -40,7 +40,7 @@ function Reservations() {
 
   const handleStatusChange = async (reservationId, newStatus) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('access_token');
       const response = await fetch(`http://127.0.0.1:8000/api/reservations/${reservationId}/`, {
         method: 'PATCH',
         headers: {
@@ -71,7 +71,7 @@ function Reservations() {
   const handleCancelReservation = async (reservationId) => {
     if (window.confirm('Are you sure you want to cancel this reservation?')) {
       try {
-        const token = localStorage.getItem('token');
+      const token = localStorage.getItem('access_token');
         const response = await fetch(`http://127.0.0.1:8000/api/reservations/${reservationId}/`, {
           method: 'DELETE',
           headers: {
@@ -104,7 +104,7 @@ function Reservations() {
     .filter(reservation =>
       searchQuery
         ? reservation.guest_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          reservation.room_name.toLowerCase().includes(searchQuery.toLowerCase())
+          reservation.room.name.toLowerCase().includes(searchQuery.toLowerCase())
         : true
     );
 
@@ -170,7 +170,7 @@ function Reservations() {
             <div className="reservation-header">
               <div className="room-info">
                 <FaBed className="icon" />
-                <h3>{reservation.room_name}</h3>
+                <h3>{reservation.room.name}</h3>
               </div>
               <span className={`status-badge ${getStatusColor(reservation.status)}`}>
                 {reservation.status.replace('_', ' ')}
@@ -185,8 +185,8 @@ function Reservations() {
               <div className="detail-item">
                 <FaCalendarAlt className="icon" />
                 <div className="dates">
-                  <div>Check-in: {format(new Date(reservation.check_in_date), 'MMM dd, yyyy')}</div>
-                  <div>Check-out: {format(new Date(reservation.check_out_date), 'MMM dd, yyyy')}</div>
+                  <div>Check-in: {format(new Date(reservation.check_in), 'MMM dd, yyyy')}</div>
+                  <div>Check-out: {format(new Date(reservation.check_out), 'MMM dd, yyyy')}</div>
                 </div>
               </div>
             </div>
