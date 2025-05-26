@@ -32,7 +32,7 @@ function Rooms() {
 
       if (filters.minPrice) params.append('min_price', filters.minPrice);
       if (filters.maxPrice) params.append('max_price', filters.maxPrice);
-      if (filters.capacity) params.append('capacity', filters.capacity);
+      if (filters.capacity) params.append('max_occupants', filters.capacity);
       if (filters.type !== 'all') params.append('type', filters.type);
       if (searchTerm) params.append('search', searchTerm);
 
@@ -177,15 +177,15 @@ function Rooms() {
                 <div className="room-details">
                   <div className="detail-item">
                     <FaBed className="detail-icon" />
-                    <span>King Bed</span>
+                    <span>{room.num_beds} {room.num_beds > 1 ? 'Beds' : 'Bed'}</span>
                   </div>
                   <div className="detail-item">
                     <FaUsers className="detail-icon" />
-                    <span>{room.capacity} Guests</span>
+                    <span>{room.max_occupants} Guests</span>
                   </div>
                   <div className="detail-item">
                     <FaWifi className="detail-icon" />
-                    <span>Free WiFi</span>
+                    <span>{room.wifi ? 'Free WiFi' : 'No WiFi'}</span>
                   </div>
                 </div>
 

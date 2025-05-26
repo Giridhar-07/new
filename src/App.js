@@ -35,6 +35,10 @@ function App() {
           const data = await response.json();
           if (data.valid) {
             setIsAuthenticated(true);
+            localStorage.setItem('is_staff', data.is_staff);
+            localStorage.setItem('user_id', data.user_id);
+            localStorage.setItem('user_email', data.email);
+            localStorage.setItem('user_name', data.name);
           } else {
             setIsAuthenticated(false);
             localStorage.removeItem('access_token');
@@ -64,10 +68,16 @@ function App() {
   }
 
   // Protected Route Component
-  const ProtectedRoute = ({ children }) => {
+  const ProtectedRoute = ({ children, staffOnly = false }) => {
     if (!isAuthenticated) {
       return <Navigate to="/login" />;
     }
+    
+    const isStaff = localStorage.getItem('is_staff') === 'true';
+    if (staffOnly && !isStaff) {
+      return <Navigate to="/" />;
+    }
+    
     return children;
   };
 
@@ -105,7 +115,7 @@ function App() {
 
           {/* Protected Routes */}
           <Route path="/dashboard" element={
-            <ProtectedRoute>
+            <ProtectedRoute staffOnly>
               <DashboardLayout>
                 <Dashboard />
               </DashboardLayout>
@@ -133,14 +143,14 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/customers" element={
-            <ProtectedRoute>
+            <ProtectedRoute staffOnly>
               <DashboardLayout>
                 <Customers />
               </DashboardLayout>
             </ProtectedRoute>
           } />
           <Route path="/analytics" element={
-            <ProtectedRoute>
+            <ProtectedRoute staffOnly>
               <DashboardLayout>
                 <Analytics />
               </DashboardLayout>
