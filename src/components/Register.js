@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './Register.css';
 
-function Register() {
+function Register({ setIsAuthenticated }) {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -54,6 +54,9 @@ function Register() {
         // Automatically log in the user and redirect
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
+        localStorage.setItem('user_id', data.user_id);
+        localStorage.setItem('customer_id', data.customer_id);
+        setIsAuthenticated(true);
         navigate('/dashboard');
       } else {
         setError(data.error || 'Registration failed. Please try again.');

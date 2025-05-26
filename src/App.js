@@ -24,14 +24,30 @@ function App() {
       if (token) {
         try {
           const response = await fetch('http://127.0.0.1:8000/api/verify-token/', {
+            method: 'POST',
             headers: {
-              'Authorization': `Bearer ${token}`
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
             }
           });
-          setIsAuthenticated(response.ok);
+          
+          const data = await response.json();
+          if (data.valid) {
+            setIsAuthenticated(true);
+          } else {
+            setIsAuthenticated(false);
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('customer_id');
+          }
         } catch (error) {
           console.error('Auth check failed:', error);
           setIsAuthenticated(false);
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          localStorage.removeItem('user_id');
+          localStorage.removeItem('customer_id');
         }
       } else {
         setIsAuthenticated(false);
