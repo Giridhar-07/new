@@ -205,15 +205,50 @@
     animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .login-nav-link {
-    width: 100%;
-    text-align: center;
-    margin-top: 1rem;
-  }
+.login-nav-link, .register-nav-link, .dashboard-nav-link {
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
 
-  .logo {
-    font-size: 1.75rem;
-  }
+.login-nav-link {
+  background: #3b82f6;
+  color: white;
+}
+
+.login-nav-link:hover {
+  background: #2563eb;
+}
+
+.register-nav-link {
+  background: #10b981;
+  color: white;
+  margin-left: 0.5rem;
+}
+
+.register-nav-link:hover {
+  background: #059669;
+}
+
+.dashboard-nav-link {
+  background: #8b5cf6;
+  color: white;
+}
+
+.dashboard-nav-link:hover {
+  background: #7c3aed;
+}
+
+.profile-nav-link {
+  background: #ef4444;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.profile-nav-link:hover {
+  background: #dc2626;
 }
 
 @keyframes slideDown {

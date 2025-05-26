@@ -165,9 +165,9 @@ function Rooms() {
                   alt={room.name}
                   className="room-image"
                 />
-                <div className="room-tag">
-                  {room.type.charAt(0).toUpperCase() + room.type.slice(1)}
-                </div>
+              <div className="room-tag">
+                {room.room_type ? room.room_type.charAt(0).toUpperCase() + room.room_type.slice(1) : ''}
+              </div>
               </div>
 
               <div className="room-content">

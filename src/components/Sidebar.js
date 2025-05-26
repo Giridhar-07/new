@@ -48,23 +48,25 @@ function Sidebar({ setIsAuthenticated }) {
     fetchUserData();
   }, []);
 
+  const isStaff = localStorage.getItem('is_staff') === 'true';
+
   const navigationItems = [
     {
       section: 'Main',
       items: [
-        { path: '/dashboard', icon: <FaHome />, text: 'Dashboard' },
-        { path: '/rooms', icon: <FaBed />, text: 'Rooms', badge: '12' },
-        { path: '/reservations', icon: <FaCalendarAlt />, text: 'Reservations', badge: '5' }
+        ...(isStaff ? [{ path: '/dashboard', icon: <FaHome />, text: 'Dashboard' }] : []),
+        { path: '/rooms', icon: <FaBed />, text: 'Rooms' },
+        { path: '/reservations', icon: <FaCalendarAlt />, text: 'Reservations' }
       ]
     },
-    {
+    ...(isStaff ? [{
       section: 'Management',
       items: [
         { path: '/customers', icon: <FaUsers />, text: 'Customers' },
         { path: '/analytics', icon: <FaChartBar />, text: 'Analytics' },
-        { path: '/settings', icon: <FaCog />, text: 'Settings' },
-      ],
-    }
+        { path: '/settings', icon: <FaCog />, text: 'Settings' }
+      ]
+    }] : [])
   ];
 
   const toggleSidebar = () => {

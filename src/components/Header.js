@@ -54,12 +54,29 @@ function Header() {
           >
             Reservations
           </Link>
-          {!localStorage.getItem('token') && (
+          {!localStorage.getItem('access_token') ? (
+            <>
+              <Link to="/login" className="nav-link login-nav-link">
+                Login
+              </Link>
+              <Link to="/register" className="nav-link register-nav-link">
+                Register
+              </Link>
+            </>
+          ) : localStorage.getItem('is_staff') === 'true' ? (
+            <Link to="/dashboard" className="nav-link dashboard-nav-link">
+              Dashboard
+            </Link>
+          ) : (
             <Link 
-              to="/login" 
-              className="nav-link login-nav-link"
+              to="#" 
+              className="nav-link profile-nav-link"
+              onClick={() => {
+                localStorage.clear();
+                window.location.href = '/login';
+              }}
             >
-              Login
+              Logout
             </Link>
           )}
         </nav>
