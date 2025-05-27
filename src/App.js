@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
@@ -13,6 +13,27 @@ import Register from './components/Register';
 import LandingPage from './components/LandingPage';
 import Chatbot from './components/Chatbot';
 import './App.css';
+
+// Protected Route Wrapper Component
+const ProtectedRouteWrapper = ({ children, staffOnly = false, isAuthenticated }) => {
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} />;
+  }
+
+  const isStaff = localStorage.getItem('is_staff') === 'true';
+  if (staffOnly && !isStaff) {
+    return <Navigate to="/" state={{ from: location }} />;
+  }
+
+  // Redirect customers to home page if they try to access the dashboard
+  if (location.pathname === '/dashboard' && !isStaff) {
+    return <Navigate to="/" state={{ from: location }} />;
+  }
+
+  return children;
+};
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -41,18 +62,12 @@ function App() {
             localStorage.setItem('user_name', data.name);
           } else {
             setIsAuthenticated(false);
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-            localStorage.removeItem('user_id');
-            localStorage.removeItem('customer_id');
+            localStorage.clear();
           }
         } catch (error) {
           console.error('Auth check failed:', error);
           setIsAuthenticated(false);
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-          localStorage.removeItem('user_id');
-          localStorage.removeItem('customer_id');
+          localStorage.clear();
         }
       } else {
         setIsAuthenticated(false);
@@ -67,32 +82,29 @@ function App() {
     return <div className="loading-screen">Loading...</div>;
   }
 
-  // Protected Route Component
-  const ProtectedRoute = ({ children, staffOnly = false }) => {
-    if (!isAuthenticated) {
-      return <Navigate to="/login" />;
-    }
-    
-    const isStaff = localStorage.getItem('is_staff') === 'true';
-    if (staffOnly && !isStaff) {
-      return <Navigate to="/" />;
-    }
-    
-    return children;
-  };
-
   // Layout Component
   const DashboardLayout = ({ children }) => {
+    const isStaff = localStorage.getItem('is_staff') === 'true';
     return (
-      <div className="dashboard-layout">
-        <Sidebar setIsAuthenticated={setIsAuthenticated} />
-        <div className="main-content">
-          {children}
+      <>
+        {!isStaff && <Header />}
+        <div className="dashboard-layout">
+          {isStaff && <Sidebar setIsAuthenticated={setIsAuthenticated} />}
+          <div className="main-content">
+            {children}
+          </div>
+          <Chatbot />
         </div>
-        <Chatbot />
-      </div>
+      </>
     );
   };
+
+  // Protected Route Component that uses the wrapper
+  const ProtectedRoute = ({ children, staffOnly = false }) => (
+    <ProtectedRouteWrapper staffOnly={staffOnly} isAuthenticated={isAuthenticated}>
+      {children}
+    </ProtectedRouteWrapper>
+  );
 
   return (
     <Router>
@@ -107,10 +119,18 @@ function App() {
             </>
           } />
           <Route path="/login" element={
-            !isAuthenticated ? <Login setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/dashboard" />
+            !isAuthenticated ? (
+              <Login setIsAuthenticated={setIsAuthenticated} />
+            ) : (
+              <Navigate to={localStorage.getItem('is_staff') === 'true' ? '/dashboard' : '/'} />
+            )
           } />
           <Route path="/register" element={
-            !isAuthenticated ? <Register setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/dashboard" />
+            !isAuthenticated ? (
+              <Register setIsAuthenticated={setIsAuthenticated} />
+            ) : (
+              <Navigate to={localStorage.getItem('is_staff') === 'true' ? '/dashboard' : '/'} />
+            )
           } />
 
           {/* Protected Routes */}

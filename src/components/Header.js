@@ -36,26 +36,16 @@ function Header() {
         </button>
 
         <nav className={`nav-links ${isMobileMenuOpen ? 'open' : ''}`}>
-          <Link 
-            to="/" 
-            className={`nav-link ${isActive('/') ? 'active' : ''}`}
-          >
+          <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
             Home
           </Link>
-          <Link 
-            to="/rooms" 
-            className={`nav-link ${isActive('/rooms') ? 'active' : ''}`}
-          >
-            Rooms
-          </Link>
-          <Link 
-            to="/reservations" 
-            className={`nav-link ${isActive('/reservations') ? 'active' : ''}`}
-          >
-            Reservations
-          </Link>
+          
           {!localStorage.getItem('access_token') ? (
+            // Public navigation
             <>
+              <Link to="/rooms" className={`nav-link ${isActive('/rooms') ? 'active' : ''}`}>
+                Rooms
+              </Link>
               <Link to="/login" className="nav-link login-nav-link">
                 Login
               </Link>
@@ -64,20 +54,48 @@ function Header() {
               </Link>
             </>
           ) : localStorage.getItem('is_staff') === 'true' ? (
-            <Link to="/dashboard" className="nav-link dashboard-nav-link">
-              Dashboard
-            </Link>
+            // Staff navigation
+            <>
+              <Link to="/dashboard" className="nav-link dashboard-nav-link">
+                Dashboard
+              </Link>
+              <span className="user-name-display">
+                {localStorage.getItem('user_name')}
+              </span>
+              <Link 
+                to="#" 
+                className="nav-link logout-nav-link"
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.href = '/login';
+                }}
+              >
+                Logout
+              </Link>
+            </>
           ) : (
-            <Link 
-              to="#" 
-              className="nav-link profile-nav-link"
-              onClick={() => {
-                localStorage.clear();
-                window.location.href = '/login';
-              }}
-            >
-              Logout
-            </Link>
+            // Customer navigation
+            <>
+              <Link to="/rooms" className={`nav-link ${isActive('/rooms') ? 'active' : ''}`}>
+                Rooms
+              </Link>
+              <Link to="/reservations" className={`nav-link ${isActive('/reservations') ? 'active' : ''}`}>
+                My Reservations
+              </Link>
+              <span className="user-name-display">
+                {localStorage.getItem('user_name')}
+              </span>
+              <Link 
+                to="#" 
+                className="nav-link logout-nav-link"
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.href = '/login';
+                }}
+              >
+                Logout
+              </Link>
+            </>
           )}
         </nav>
       </div>

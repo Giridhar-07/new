@@ -126,10 +126,7 @@ function Sidebar({ setIsAuthenticated }) {
           <button 
             className="logout-button"
             onClick={() => {
-              localStorage.removeItem('access_token');
-              localStorage.removeItem('refresh_token');
-              localStorage.removeItem('user_id');
-              localStorage.removeItem('customer_id');
+              localStorage.clear();
               setIsAuthenticated(false);
               window.location.href = '/login';
             }}

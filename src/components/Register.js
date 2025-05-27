@@ -56,8 +56,15 @@ function Register({ setIsAuthenticated }) {
         localStorage.setItem('refresh_token', data.refresh);
         localStorage.setItem('user_id', data.user_id);
         localStorage.setItem('customer_id', data.customer_id);
+        localStorage.setItem('is_staff', data.is_staff);
+        localStorage.setItem('user_name', data.name);
+        localStorage.setItem('user_email', data.email);
         setIsAuthenticated(true);
-        navigate('/dashboard');
+        if (data.is_staff) {
+          navigate('/dashboard');
+        } else {
+          navigate('/');
+        }
       } else {
         setError(data.error || 'Registration failed. Please try again.');
       }
