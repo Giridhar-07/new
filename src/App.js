@@ -52,7 +52,6 @@ function App() {
               'Content-Type': 'application/json'
             }
           });
-          
           const data = await response.json();
           if (data.valid) {
             setIsAuthenticated(true);
@@ -112,8 +111,8 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={
-            <>
-              <Header />
+          <>
+             <Header />
               <LandingPage />
               <Chatbot />
             </>
