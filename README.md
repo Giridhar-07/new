@@ -27,7 +27,7 @@ Modern and elegant hotel management system built with React, TypeScript, and mod
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/luxurystay-frontend.git
+git clone https://github.com/clowno7/luxurystay-frontend.git
 cd luxurystay-frontend
 ```
 
