@@ -159,13 +159,13 @@ MIT License - see LICENSE file for details
 
 ## 👥 Team
 
-- Frontend Lead: [Your Name]
-- UI/UX Designer: [Designer Name]
-- Backend Lead: [Backend Dev Name]
+- Frontend Lead: [Giridhar]
+- UI/UX Designer: [Giridhar]
+- Backend Lead: [Giridhar]
 
 ## 📞 Support
 
-For support, email support@luxurystay.com or join our Slack channel.
+For support, email clown7g7@gmail.com or join our Slack channel.
 
 ## 🙏 Acknowledgments
 
