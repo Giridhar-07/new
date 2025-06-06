@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  FaBed, 
-  FaUsers, 
-  FaWifi, 
-  FaTv, 
-  FaSnowflake, 
-  FaParking,
-  FaCalendarAlt,
-  FaArrowRight
-} from 'react-icons/fa';
+import { FaBed, FaUsers, FaWifi, FaTv, FaSnowflake, FaParking, FaArrowRight } from 'react-icons/fa';
 import './RoomDetails.css';
 
 function RoomDetails() {
@@ -20,44 +11,54 @@ function RoomDetails() {
   const [bookingDates, setBookingDates] = useState({
     checkIn: '',
     checkOut: '',
-    guests: 1
+    guests: 1,
   });
 
   useEffect(() => {
-    fetchRoomDetails();
-  }, [id]);
-
-  const fetchRoomDetails = async () => {
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/api/rooms/${id}/`);
-      if (response.ok) {
-        const data = await response.json();
-        setRoom(data);
+    const fetchRoomDetails = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://127.0.0.1:8000/api/rooms/${id}/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setRoom(data);
+        } else if (response.status === 401) {
+          // Handle unauthorized - maybe redirect to login
+          console.error('Unauthorized to fetch room details');
+          navigate('/login'); // Redirect to login page
+        } else {
+          console.error('Error fetching room details:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching room details:', error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error fetching room details:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    fetchRoomDetails();
+  }, [id, navigate]);
 
   const handleBookingSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('http://127.0.0.1:8000/api/reservations/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           room_id: id,
           check_in_date: bookingDates.checkIn,
           check_out_date: bookingDates.checkOut,
-          guest_count: bookingDates.guests
-        })
+          guest_count: bookingDates.guests,
+        }),
       });
 
       if (response.ok) {
@@ -90,7 +91,7 @@ function RoomDetails() {
     { icon: <FaWifi />, name: 'Free Wi-Fi' },
     { icon: <FaTv />, name: 'Smart TV' },
     { icon: <FaSnowflake />, name: 'Air Conditioning' },
-    { icon: <FaParking />, name: 'Free Parking' }
+    { icon: <FaParking />, name: 'Free Parking' },
   ];
 
   return (
@@ -139,10 +140,12 @@ function RoomDetails() {
                     type="date"
                     className="form-control"
                     value={bookingDates.checkIn}
-                    onChange={(e) => setBookingDates(prev => ({
-                      ...prev,
-                      checkIn: e.target.value
-                    }))}
+                    onChange={(e) =>
+                      setBookingDates((prev) => ({
+                        ...prev,
+                        checkIn: e.target.value,
+                      }))
+                    }
                     required
                   />
                 </div>
@@ -153,10 +156,12 @@ function RoomDetails() {
                     type="date"
                     className="form-control"
                     value={bookingDates.checkOut}
-                    onChange={(e) => setBookingDates(prev => ({
-                      ...prev,
-                      checkOut: e.target.value
-                    }))}
+                    onChange={(e) =>
+                      setBookingDates((prev) => ({
+                        ...prev,
+                        checkOut: e.target.value,
+                      }))
+                    }
                     required
                   />
                 </div>
@@ -167,10 +172,12 @@ function RoomDetails() {
                     type="number"
                     className="form-control"
                     value={bookingDates.guests}
-                    onChange={(e) => setBookingDates(prev => ({
-                      ...prev,
-                      guests: parseInt(e.target.value)
-                    }))}
+                    onChange={(e) =>
+                      setBookingDates((prev) => ({
+                        ...prev,
+                        guests: parseInt(e.target.value),
+                      }))
+                    }
                     min="1"
                     max={room.capacity}
                     required
@@ -183,7 +190,9 @@ function RoomDetails() {
                 </button>
               </form>
 
-              <span className={`availability-label ${room.is_available ? 'available' : 'unavailable'}`}>
+              <span
+                className={`availability-label ${room.is_available ? 'available' : 'unavailable'}`}
+              >
                 {room.is_available ? 'Available' : 'Currently Unavailable'}
               </span>
             </div>

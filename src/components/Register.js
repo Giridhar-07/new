@@ -66,7 +66,18 @@ function Register({ setIsAuthenticated }) {
           navigate('/');
         }
       } else {
-        setError(data.error || 'Registration failed. Please try again.');
+        // Display specific backend errors if available
+        if (data && data.details) {
+          const errorMessages = Object.entries(data.details)
+            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+            .join('\n');
+          setError(`Registration failed:\n${errorMessages}`);
+        } else if (data && data.error) {
+           setError(`Registration failed: ${data.error}`);
+        }
+        else {
+          setError('Registration failed. Please try again.');
+        }
       }
     } catch (err) {
       setError('An error occurred. Please try again later.');
