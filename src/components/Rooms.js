@@ -161,9 +161,12 @@ function Rooms() {
             <div key={room.id} className="room-card">
               <div className="room-image-container">
                 <img
-                  src={`http://127.0.0.1:8000${room.image}` || '/images/default-room.jpg'}
+                  src={room.image ? `http://127.0.0.1:8000${room.image}` : '/images/default-room.jpg'}
                   alt={room.name}
                   className="room-image"
+                  onError={(e) => {
+                    e.target.src = '/images/default-room.jpg';
+                  }}
                 />
               <div className="room-tag">
                 {room.room_type ? room.room_type.charAt(0).toUpperCase() + room.room_type.slice(1) : ''}

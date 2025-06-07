@@ -140,7 +140,10 @@ function RoomDetails() {
           <div className="room-details-header">
             <img
               ref={headerRef}
-              src={`http://127.0.0.1:8000${room.image}` || '/images/default-room.jpg'}
+              src={room.image ? `http://127.0.0.1:8000${room.image}` : '/images/default-room.jpg'}
+              onError={(e) => {
+                e.target.src = '/images/default-room.jpg';
+              }}
               alt={room.name}
               className="room-details-image"
             />

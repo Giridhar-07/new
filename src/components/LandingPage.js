@@ -15,8 +15,7 @@ function LandingPage() {
     {
       icon: <FaHotel />,
       title: 'Luxury Rooms',
-      description:
-        'Experience comfort in our carefully designed rooms with modern amenities and stunning views.',
+      description: 'Experience comfort in our carefully designed rooms with modern amenities and stunning views.',
     },
     {
       icon: <FaCalendarCheck />,
@@ -70,13 +69,9 @@ function LandingPage() {
             </div>
           </div>
 
-          <div className="hero-image">
-            <img
-              src="/images/hero-hotel.jpg"
-              alt="Luxury Hotel Room"
-              loading="lazy"
-            />
-          </div>
+            <div className="hero-image">
+              <img src="/images/hero-hotel.jpg" alt="Luxury Hotel Room" loading="lazy" />
+            </div>
         </div>
       </section>
 
@@ -84,10 +79,7 @@ function LandingPage() {
         <div className="features-content">
           <div className="section-title">
             <h2>Why Choose Us</h2>
-            <p>
-              Experience the perfect blend of luxury, comfort, and exceptional service that
-              sets us apart.
-            </p>
+            <p>Experience the perfect blend of luxury, comfort, and exceptional service that sets us apart.</p>
           </div>
 
           <div className="features-grid">
@@ -109,17 +101,38 @@ function LandingPage() {
       <section className="cta-section">
         <div className="features-content">
           <div className="section-title">
-            <h2>Ready to Experience Luxury?</h2>
-            <p>Book your stay now and enjoy exclusive benefits and special offers.</p>
-            <div className="hero-buttons" style={{ justifyContent: 'center', marginTop: '2rem' }}>
-              <Link to="/register" className="hero-button primary-button">
-                Sign Up Now
-                <FaArrowRight />
-              </Link>
-              <Link to="/rooms" className="hero-button secondary-button">
-                Browse Rooms
-              </Link>
-            </div>
+            {!localStorage.getItem('access_token') ? (
+              <>
+                <h2>Ready to Experience Luxury?</h2>
+                <p>Book your stay now and enjoy exclusive benefits and special offers.</p>
+                <div 
+                  className="hero-buttons"
+                  style={{ justifyContent: 'center', marginTop: '2rem' }}
+                >
+                  <Link to="/register" className="hero-button primary-button">
+                    Sign Up Now
+                    <FaArrowRight />
+                  </Link>
+                  <Link to="/rooms" className="hero-button secondary-button">
+                    Browse Rooms
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2>Explore Our Luxurious Rooms</h2>
+                <p>Discover our premium accommodations and book your perfect stay.</p>
+                <div 
+                  className="hero-buttons"
+                  style={{ justifyContent: 'center', marginTop: '2rem' }}
+                >
+                  <Link to="/rooms" className="hero-button primary-button">
+                    View Rooms
+                    <FaArrowRight />
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
