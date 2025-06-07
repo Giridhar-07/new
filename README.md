@@ -27,7 +27,7 @@ Modern and elegant hotel management system built with React, TypeScript, and mod
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/luxurystay-frontend.git
+git clone https://github.com/clowno7/luxurystay-frontend.git
 cd luxurystay-frontend
 ```
 
@@ -159,13 +159,13 @@ MIT License - see LICENSE file for details
 
 ## 👥 Team
 
-- Frontend Lead: [Your Name]
-- UI/UX Designer: [Designer Name]
-- Backend Lead: [Backend Dev Name]
+- Frontend Lead: [Giridhar]
+- UI/UX Designer: [Giridhar]
+- Backend Lead: [Giridhar]
 
 ## 📞 Support
 
-For support, email support@luxurystay.com or join our Slack channel.
+For support, email clown7g7@gmail.com or join our Slack channel.
 
 ## 🙏 Acknowledgments
 
