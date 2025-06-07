@@ -11,6 +11,7 @@ import Analytics from './components/Analytics';
 import Login from './components/Login';
 import Register from './components/Register';
 import LandingPage from './components/LandingPage';
+import Contact from './components/Contact';
 import Chatbot from './components/Chatbot';
 import './App.css';
 
@@ -174,6 +175,11 @@ function App() {
                 <Analytics />
               </DashboardLayout>
             </ProtectedRoute>
+          } />
+          <Route path="/contact" element={
+            <DashboardLayout>
+              <Contact />
+            </DashboardLayout>
           } />
         </Routes>
       </div>

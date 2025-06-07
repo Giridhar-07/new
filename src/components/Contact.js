@@ -144,3 +144,48 @@ function Contact() {
               </div>
 
               <button 
+                type="submit" 
+                className={`submit-button ${submitStatus}`}
+                disabled={submitStatus === 'sending'}
+              >
+                <span className="button-text">
+                  {submitStatus === 'sending' ? 'Sending...' : 'Send Message'}
+                </span>
+                <FaPaperPlane className="button-icon" />
+              </button>
+            </form>
+
+            {submitStatus === 'success' && (
+              <div className="success-message">
+                Thank you! Your message has been sent successfully.
+              </div>
+            )}
+            {submitStatus === 'error' && (
+              <div className="error-message">
+                Oops! Something went wrong. Please try again.
+              </div>
+            )}
+          </div>
+
+          <div className="contact-info">
+            {contactInfo.map((info, index) => (
+              <div 
+                key={index} 
+                className="info-card animate-on-scroll"
+                style={{ animationDelay: `${info.delay}ms` }}
+              >
+                <div className="info-icon">{info.icon}</div>
+                <div className="info-content">
+                  <h3>{info.title}</h3>
+                  <p>{info.content}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Contact;

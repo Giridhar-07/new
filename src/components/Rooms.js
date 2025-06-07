@@ -22,7 +22,11 @@ function Rooms() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetchRooms();
+    const debounceTimer = setTimeout(() => {
+      fetchRooms();
+    }, 300); // Debounce search and filter updates
+
+    return () => clearTimeout(debounceTimer);
   }, [filters, searchTerm]);
 
   const fetchRooms = async () => {
@@ -30,11 +34,37 @@ function Rooms() {
       let url = 'http://127.0.0.1:8000/api/rooms/';
       const params = new URLSearchParams();
 
-      if (filters.minPrice) params.append('min_price', filters.minPrice);
-      if (filters.maxPrice) params.append('max_price', filters.maxPrice);
-      if (filters.capacity) params.append('max_occupants', filters.capacity);
-      if (filters.type !== 'all') params.append('type', filters.type);
-      if (searchTerm) params.append('search', searchTerm);
+      // Add search parameter if there's a search term
+      if (searchTerm.trim()) {
+        params.append('search', searchTerm.trim());
+      }
+
+      // Add price range filters
+      if (filters.minPrice) {
+        const minPrice = parseFloat(filters.minPrice);
+        if (!isNaN(minPrice) && minPrice >= 0) {
+          params.append('min_price', minPrice);
+        }
+      }
+      if (filters.maxPrice) {
+        const maxPrice = parseFloat(filters.maxPrice);
+        if (!isNaN(maxPrice) && maxPrice >= 0) {
+          params.append('max_price', maxPrice);
+        }
+      }
+
+      // Add capacity filter
+      if (filters.capacity) {
+        const capacity = parseInt(filters.capacity);
+        if (!isNaN(capacity) && capacity > 0) {
+          params.append('max_occupants', capacity);
+        }
+      }
+
+      // Add room type filter
+      if (filters.type !== 'all') {
+        params.append('type', filters.type.toLowerCase());
+      }
 
       if (params.toString()) {
         url += `?${params.toString()}`;
@@ -60,15 +90,41 @@ function Rooms() {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Validate input based on field type
+    if (name === 'minPrice' || name === 'maxPrice') {
+      // Only allow positive numbers for price
+      if (value === '' || (parseFloat(value) >= 0)) {
+        setFilters(prev => ({ ...prev, [name]: value }));
+      }
+    } else if (name === 'capacity') {
+      // Only allow positive integers for capacity
+      if (value === '' || (parseInt(value) >= 1)) {
+        setFilters(prev => ({ ...prev, [name]: value }));
+      }
+    } else {
+      setFilters(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchRooms();
+    // Search is handled by useEffect with debounce
+  };
+
+  const handlePriceBlur = () => {
+    // Validate min price is less than max price
+    if (filters.minPrice && filters.maxPrice) {
+      const min = parseFloat(filters.minPrice);
+      const max = parseFloat(filters.maxPrice);
+      if (min > max) {
+        setFilters(prev => ({
+          ...prev,
+          minPrice: filters.maxPrice,
+          maxPrice: filters.minPrice
+        }));
+      }
+    }
   };
 
   const roomTypes = ['all', 'standard', 'deluxe', 'suite'];
@@ -127,6 +183,9 @@ function Rooms() {
                 placeholder="Min Price"
                 value={filters.minPrice}
                 onChange={handleFilterChange}
+                onBlur={handlePriceBlur}
+                min="0"
+                step="1"
                 className="filter-input"
               />
             </div>
@@ -138,6 +197,9 @@ function Rooms() {
                 placeholder="Max Price"
                 value={filters.maxPrice}
                 onChange={handleFilterChange}
+                onBlur={handlePriceBlur}
+                min="0"
+                step="1"
                 className="filter-input"
               />
             </div>
