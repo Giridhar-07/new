@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaBed, FaUsers, FaWifi, FaTv, FaSnowflake, FaParking, FaArrowRight } from 'react-icons/fa';
 import './RoomDetails.css';
@@ -8,6 +8,8 @@ function RoomDetails() {
   const navigate = useNavigate();
   const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(true);
+  const headerRef = useRef(null);
+  const amenitiesRef = useRef(null);
   const [bookingDates, setBookingDates] = useState({
     checkIn: '',
     checkOut: '',
@@ -15,9 +17,46 @@ function RoomDetails() {
   });
 
   useEffect(() => {
+    // Parallax effect for header image
+    const handleScroll = () => {
+      if (headerRef.current) {
+        const scrolled = window.scrollY;
+        headerRef.current.style.transform = `translateY(${scrolled * 0.5}px)`;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    // Intersection Observer for amenities animation
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const amenityItems = entry.target.querySelectorAll('.amenity-item');
+            amenityItems.forEach((item, index) => {
+              item.style.setProperty('--index', index);
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    if (amenitiesRef.current) {
+      observer.observe(amenitiesRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [room]);
+
+  useEffect(() => {
     const fetchRoomDetails = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('access_token');
         const response = await fetch(`http://127.0.0.1:8000/api/rooms/${id}/`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -46,7 +85,7 @@ function RoomDetails() {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('access_token');
       const response = await fetch('http://127.0.0.1:8000/api/reservations/', {
         method: 'POST',
         headers: {
@@ -100,7 +139,8 @@ function RoomDetails() {
         <div className="room-details-card">
           <div className="room-details-header">
             <img
-              src={room.image || '/images/default-room.jpg'}
+              ref={headerRef}
+              src={`http://127.0.0.1:8000${room.image}` || '/images/default-room.jpg'}
               alt={room.name}
               className="room-details-image"
             />
@@ -121,7 +161,7 @@ function RoomDetails() {
 
             <div className="details-section">
               <h2 className="section-title">Amenities</h2>
-              <div className="amenities-grid">
+              <div ref={amenitiesRef} className="amenities-grid">
                 {amenities.map((amenity, index) => (
                   <div key={index} className="amenity-item">
                     <span className="amenity-icon">{amenity.icon}</span>
@@ -140,12 +180,17 @@ function RoomDetails() {
                     type="date"
                     className="form-control"
                     value={bookingDates.checkIn}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const element = e.target;
+                      element.style.transform = 'scale(1.02)';
+                      setTimeout(() => {
+                        element.style.transform = 'scale(1)';
+                      }, 150);
                       setBookingDates((prev) => ({
                         ...prev,
                         checkIn: e.target.value,
-                      }))
-                    }
+                      }));
+                    }}
                     required
                   />
                 </div>
@@ -156,12 +201,17 @@ function RoomDetails() {
                     type="date"
                     className="form-control"
                     value={bookingDates.checkOut}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const element = e.target;
+                      element.style.transform = 'scale(1.02)';
+                      setTimeout(() => {
+                        element.style.transform = 'scale(1)';
+                      }, 150);
                       setBookingDates((prev) => ({
                         ...prev,
                         checkOut: e.target.value,
-                      }))
-                    }
+                      }));
+                    }}
                     required
                   />
                 </div>
@@ -172,12 +222,17 @@ function RoomDetails() {
                     type="number"
                     className="form-control"
                     value={bookingDates.guests}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const element = e.target;
+                      element.style.transform = 'scale(1.02)';
+                      setTimeout(() => {
+                        element.style.transform = 'scale(1)';
+                      }, 150);
                       setBookingDates((prev) => ({
                         ...prev,
                         guests: parseInt(e.target.value),
-                      }))
-                    }
+                      }));
+                    }}
                     min="1"
                     max={room.capacity}
                     required

@@ -161,7 +161,7 @@ function Rooms() {
             <div key={room.id} className="room-card">
               <div className="room-image-container">
                 <img
-                  src={room.image || '/images/default-room.jpg'}
+                  src={`http://127.0.0.1:8000${room.image}` || '/images/default-room.jpg'}
                   alt={room.name}
                   className="room-image"
                 />
