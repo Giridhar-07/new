@@ -1,272 +1,220 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { FaBed, FaUsers, FaWifi, FaTv, FaSnowflake, FaParking, FaArrowRight, FaCalendarAlt, FaClock } from 'react-icons/fa';
-import { format } from 'date-fns';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import {
+  FaBed,
+  FaUsers,
+  FaWifi,
+  FaTv,
+  FaSnowflake,
+  FaParking,
+  FaArrowRight,
+  FaCalendarAlt,
+  FaClock,
+} from 'react-icons/fa';
 import DatePicker from './DatePicker';
 import useAvailability from '../hooks/useAvailability';
+import { useToast } from './ToastManager';
 import './RoomDetails.css';
 
 function RoomDetails() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [room, setRoom] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const headerRef = useRef(null);
-  const amenitiesRef = useRef(null);
-  const [dateRange, setDateRange] = useState({ from: null, to: null });
-  const [guests, setGuests] = useState(1);
-  const { isAvailable, isLoading: availabilityLoading, totalPrice, blockedDates, error: availabilityError } = useAvailability(
-    id,
-    dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : null,
-    dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : null
-  );
+  const [selectedRange, setSelectedRange] = useState(null);
+  const showToast = useToast();
+  
+  const {
+    isAvailable,
+    isLoading: availabilityLoading,
+    totalPrice,
+    blockedDates,
+    error: availabilityError,
+  } = useAvailability(id, selectedRange);
 
   useEffect(() => {
-    // Parallax effect for header image
-    const handleScroll = () => {
-      if (headerRef.current) {
-        const scrolled = window.scrollY;
-        headerRef.current.style.transform = `translateY(${scrolled * 0.5}px)`;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    // Intersection Observer for amenities animation
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const amenityItems = entry.target.querySelectorAll('.amenity-item');
-            amenityItems.forEach((item, index) => {
-              item.style.setProperty('--index', index);
-            });
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.2 }
-    );
-
-    if (amenitiesRef.current) {
-      observer.observe(amenitiesRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [room]);
-
-  useEffect(() => {
-    const fetchRoomDetails = async () => {
+    const fetchRoom = async () => {
       try {
-        const token = localStorage.getItem('access_token');
-        const response = await fetch(`http://127.0.0.1:8000/api/rooms/${id}/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(`http://localhost:8000/api/rooms/${id}/`);
+        const data = await response.json();
+        
         if (response.ok) {
-          const data = await response.json();
           setRoom(data);
-        } else if (response.status === 401) {
-          // Handle unauthorized - maybe redirect to login
-          console.error('Unauthorized to fetch room details');
-          navigate('/login'); // Redirect to login page
         } else {
-          console.error('Error fetching room details:', response.statusText);
+          showToast('Failed to load room details', 'error');
         }
       } catch (error) {
-        console.error('Error fetching room details:', error);
-      } finally {
-        setLoading(false);
+        showToast('Network error. Please try again.', 'error');
       }
     };
-    fetchRoomDetails();
-  }, [id, navigate]);
 
-  const handleBookingSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!isAvailable) {
-      alert('Selected dates are not available');
+    fetchRoom();
+  }, [id, showToast]);
+
+  const handleRangeSelect = (range) => {
+    setSelectedRange(range);
+  };
+
+  const handleBooking = async () => {
+    if (!selectedRange) {
+      showToast('Please select check-in and check-out dates', 'error');
       return;
     }
 
-    if (!dateRange.from || !dateRange.to) {
-      alert('Please select check-in and check-out dates');
+    if (!isAvailable) {
+      showToast('Room is not available for selected dates', 'error');
       return;
     }
 
     try {
-      const token = localStorage.getItem('access_token');
-      const response = await fetch('http://127.0.0.1:8000/api/reservations/', {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        showToast('Please login to book a room', 'error');
+        return;
+      }
+
+      const response = await fetch('http://localhost:8000/api/bookings/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-          body: JSON.stringify({
-            room_id: id,
-            check_in_date: format(dateRange.from, 'yyyy-MM-dd'),
-            check_out_date: format(dateRange.to, 'yyyy-MM-dd'),
-            guest_count: guests,
-          }),
+        body: JSON.stringify({
+          room: id,
+          check_in: selectedRange.from,
+          check_out: selectedRange.to,
+          total_price: totalPrice,
+        }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        navigate('/reservations');
+        showToast('Booking successful!', 'success');
+        setSelectedRange(null);
+      } else {
+        showToast(data.error || 'Failed to create booking', 'error');
       }
     } catch (error) {
-      console.error('Error creating reservation:', error);
+      showToast('Network error. Please try again.', 'error');
     }
   };
 
-  if (loading) {
-    return (
-      <div className="room-details-container">
-        <div className="loading-indicator">Loading...</div>
-      </div>
-    );
-  }
-
   if (!room) {
-    return (
-      <div className="room-details-container">
-        <div className="error-message">Room not found</div>
-      </div>
-    );
+    return <div className="loading">Loading...</div>;
   }
 
-  const amenities = [
-    { icon: <FaBed />, name: 'King Size Bed' },
-    { icon: <FaUsers />, name: `Fits ${room.capacity} Guests` },
-    { icon: <FaWifi />, name: 'Free Wi-Fi' },
-    { icon: <FaTv />, name: 'Smart TV' },
-    { icon: <FaSnowflake />, name: 'Air Conditioning' },
-    { icon: <FaParking />, name: 'Free Parking' },
-  ];
+  const amenityIcons = {
+    wifi: FaWifi,
+    tv: FaTv,
+    ac: FaSnowflake,
+    parking: FaParking,
+  };
 
   return (
-    <div className="room-details-container">
-      <div className="room-details-content">
-        <div className="room-details-card">
-          <div className="room-details-header">
-            <img
-              ref={headerRef}
-              src={room.image ? `http://127.0.0.1:8000${room.image}` : '/images/default-room.jpg'}
-              onError={(e) => {
-                e.target.src = '/images/default-room.jpg';
-              }}
-              alt={room.name}
-              className="room-details-image"
-            />
-            <div className="header-overlay">
-              <h1 className="room-details-title">{room.name}</h1>
-              <div className="room-details-price">
-                <span className="price-amount">${room.price}</span>
-                <span>per night</span>
-              </div>
+    <div className="room-details">
+      <div className="room-header">
+        <h2>{room.name}</h2>
+        <div className="room-type">{room.room_type}</div>
+      </div>
+
+      <div className="room-content">
+        <div className="room-image">
+          <img 
+            src={room.image ? `http://127.0.0.1:8000${room.image}` : '/images/default-room.jpg'}
+            alt={room.name}
+          />
+        </div>
+
+        <div className="room-info">
+          <div className="room-features">
+            <div className="feature">
+              <FaBed />
+              <span>{room.num_beds} {room.num_beds > 1 ? 'Beds' : 'Bed'}</span>
+            </div>
+            <div className="feature">
+              <FaUsers />
+              <span>Max {room.capacity} Guests</span>
             </div>
           </div>
 
-          <div className="room-details-body">
-            <div className="details-section">
-              <h2 className="section-title">Description</h2>
-              <p className="room-description">{room.description}</p>
-            </div>
-
-            <div className="details-section">
-              <h2 className="section-title">Amenities</h2>
-              <div ref={amenitiesRef} className="amenities-grid">
-                {amenities.map((amenity, index) => (
-                  <div key={index} className="amenity-item">
-                    <span className="amenity-icon">{amenity.icon}</span>
-                    <span className="amenity-text">{amenity.name}</span>
+          <div className="room-amenities">
+            <h3>Amenities</h3>
+            <div className="amenities-grid">
+              {room.amenities.map((amenity) => {
+                const Icon = amenityIcons[amenity.code];
+                return Icon ? (
+                  <div key={amenity.id} className="amenity">
+                    <Icon />
+                    <span>{amenity.name}</span>
                   </div>
-                ))}
-              </div>
+                ) : null;
+              })}
             </div>
+          </div>
 
-            <div className="booking-section">
-              <h2 className="section-title">Book Now</h2>
-              {availabilityError && (
-                <div className="error-message">
-                  {availabilityError}
+          <div className="room-description">
+            <h3>Description</h3>
+            <p>{room.description}</p>
+          </div>
+
+          <div className="room-price">
+            <h3>Price per Night</h3>
+            <p className="price">₹{room.price}</p>
+          </div>
+        </div>
+
+        <div className="booking-section">
+          <h3>
+            <FaCalendarAlt className="calendar-icon" />
+            Check Availability
+          </h3>
+          
+          <DatePicker
+            selectedRange={selectedRange}
+            onSelect={handleRangeSelect}
+            blockedDates={blockedDates}
+          />
+
+          {selectedRange && (
+            <div className="booking-summary">
+              <div className="dates">
+                <div>
+                  <strong>Check-in:</strong> {selectedRange.from.toLocaleDateString()}
                 </div>
+                <div>
+                  <strong>Check-out:</strong> {selectedRange.to.toLocaleDateString()}
+                </div>
+                <div>
+                  <FaClock />
+                  <span>{Math.ceil((selectedRange.to - selectedRange.from) / (1000 * 60 * 60 * 24))} nights</span>
+                </div>
+              </div>
+
+              {availabilityLoading ? (
+                <div>Checking availability...</div>
+              ) : availabilityError ? (
+                <div className="error-message">{availabilityError}</div>
+              ) : (
+                <>
+                  <div className="total-price">
+                    <strong>Total Price:</strong> ₹{totalPrice}
+                  </div>
+                  <button
+                    className={`book-button ${!isAvailable ? 'disabled' : ''}`}
+                    onClick={handleBooking}
+                    disabled={!isAvailable}
+                  >
+                    {isAvailable ? (
+                      <>
+                        Book Now <FaArrowRight />
+                      </>
+                    ) : (
+                      'Not Available'
+                    )}
+                  </button>
+                </>
               )}
-              <form onSubmit={handleBookingSubmit} className="booking-form">
-                <div className="date-range-section">
-                  <h3 className="section-subtitle">
-                    <FaCalendarAlt /> Select Dates
-                  </h3>
-                  <DatePicker
-                    selectedRange={dateRange}
-                    onSelect={setDateRange}
-                    blockedDates={blockedDates}
-                    minNights={1}
-                    maxNights={30}
-                  />
-                </div>
-                <div className="guest-section">
-                  <h3 className="section-subtitle">
-                    <FaUsers /> Number of Guests
-                  </h3>
-                  <div className="guest-selector">
-                    <button
-                      type="button"
-                      onClick={() => setGuests(prev => Math.max(1, prev - 1))}
-                      disabled={guests <= 1}
-                      className="guest-button"
-                    >
-                      -
-                    </button>
-                    <span className="guest-count">{guests}</span>
-                    <button
-                      type="button"
-                      onClick={() => setGuests(prev => Math.min(room.capacity, prev + 1))}
-                      disabled={guests >= room.capacity}
-                      className="guest-button"
-                    >
-                      +
-                    </button>
-                  </div>
-                  <p className="max-guests">Maximum {room.capacity} guests</p>
-                </div>
-
-                {dateRange.from && dateRange.to && (
-                  <div className="price-summary">
-                    <h3 className="section-subtitle">
-                      <FaClock /> Stay Duration
-                    </h3>
-                    <p className="duration">
-                      {Math.ceil((dateRange.to - dateRange.from) / (1000 * 60 * 60 * 24))} nights
-                    </p>
-                    <div className="total-price">
-                      <span>Total Price:</span>
-                      <span className="price">${totalPrice}</span>
-                    </div>
-                  </div>
-                )}
-
-                <button 
-                  type="submit" 
-                  className={`book-now-button ${!isAvailable || availabilityLoading ? 'disabled' : ''}`}
-                  disabled={!isAvailable || availabilityLoading || !dateRange.from || !dateRange.to}
-                >
-                  <span>Book Now</span>
-                  <FaArrowRight />
-                </button>
-              </form>
-
-              <span
-                className={`availability-label ${room.is_available ? 'available' : 'unavailable'}`}
-              >
-                {room.is_available ? 'Available' : 'Currently Unavailable'}
-              </span>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

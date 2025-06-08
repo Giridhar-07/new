@@ -1,109 +1,113 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from './ToastManager';
 import './Login.css';
 
 function Login({ setIsAuthenticated }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [attemptsRemaining, setAttemptsRemaining] = useState(5);
-  const [isLocked, setIsLocked] = useState(false);
   const navigate = useNavigate();
+  const showToast = useToast();
+  
+  const [credentials, setCredentials] = useState({
+    username: '',
+    password: ''
+  });
+  
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
 
-  // Check if account is locked
-  useEffect(() => {
-    const lockoutEnd = localStorage.getItem('lockoutEnd');
-    if (lockoutEnd && new Date(lockoutEnd) > new Date()) {
-      setIsLocked(true);
-      const timeLeft = Math.ceil((new Date(lockoutEnd) - new Date()) / 1000 / 60);
-      setError(`Account is temporarily locked. Please try again in ${timeLeft} minutes.`);
-    }
-  }, []);
-
-  const refreshToken = async () => {
-    try {
-      const refresh = localStorage.getItem('refresh_token');
-      const response = await fetch('http://127.0.0.1:8000/api/refresh-token/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          refresh,
-        }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        localStorage.setItem('access_token', data.access);
-        localStorage.setItem('token_expiry', data.token_expiry);
-        return true;
-      }
-      return false;
-    } catch (err) {
-      return false;
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCredentials(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-
+    
     if (isLocked) {
+      showToast('Account is temporarily locked. Please try again later.', 'error');
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/login/', {
+      const response = await fetch('http://localhost:8000/api/login/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          username: email,
-          password,
-        }),
+        body: JSON.stringify(credentials),
       });
 
-              type="email"
-              id="email"
-              className="form-control"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('accessToken', data.access);
+        localStorage.setItem('refreshToken', data.refresh);
+        setIsAuthenticated(true);
+        showToast('Successfully logged in!', 'success');
+        navigate('/');
+      } else {
+        const errorMessage = data.error || `Login failed. ${data.attempts_remaining} attempts remaining.`;
+        showToast(errorMessage, 'error');
+        
+        if (data.locked_until) {
+          setIsLocked(true);
+          setTimeout(() => {
+            setIsLocked(false);
+          }, new Date(data.locked_until) - new Date());
+        }
+      }
+    } catch (error) {
+      showToast('Network error. Please try again.', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <div className="login-card">
+        <h2>Login</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="username">Username:</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={credentials.username}
+              onChange={handleChange}
               required
-              autoComplete="username"
+              disabled={isLocked}
             />
           </div>
-
           <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
+            <label htmlFor="password">Password:</label>
             <input
               type="password"
               id="password"
-              className="form-control"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              name="password"
+              value={credentials.password}
+              onChange={handleChange}
               required
-              autoComplete="current-password"
+              disabled={isLocked}
             />
           </div>
-
-          <button type="submit" className="submit-button">
-            Sign In
+          <button
+            type="submit"
+            className="submit-button"
+            disabled={isLocked || isLoading}
+          >
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
-
-          <div className="form-footer">
-            Don&apos;t have an account?{' '}
-            <Link to="/register" className="register-link">
-              Register Now
-            </Link>
-          </div>
         </form>
+        <p className="register-link">
+          Don't have an account? <a href="/register">Register here</a>
+        </p>
       </div>
     </div>
   );

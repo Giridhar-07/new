@@ -1,76 +1,85 @@
 import { useState, useEffect } from 'react';
+import useAuth from './useAuth';
+import { useToast } from '../components/ToastManager';
 
-const useAvailability = (roomId, checkIn, checkOut) => {
-  const [isAvailable, setIsAvailable] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [pricing, setPricing] = useState({
+function useAvailability(roomId, dateRange) {
+  const { token } = useAuth();
+  const showToast = useToast();
+
+  const [state, setState] = useState({
+    isAvailable: false,
+    isLoading: false,
     totalPrice: 0,
-    pricePerNight: 0,
-    cleaningFee: 0,
-    nights: 0
+    blockedDates: [],
+    error: null,
   });
-  const [blockedDates, setBlockedDates] = useState([]);
-  const [roomDetails, setRoomDetails] = useState(null);
 
   useEffect(() => {
     const checkAvailability = async () => {
-      if (!roomId || !checkIn || !checkOut) return;
+      if (!dateRange?.from || !dateRange?.to) {
+        return;
+      }
 
-      setIsLoading(true);
-      setError(null);
+      setState(prev => ({
+        ...prev,
+        isLoading: true,
+        error: null,
+      }));
 
       try {
-        const token = localStorage.getItem('access_token');
-        const response = await fetch(`http://127.0.0.1:8000/api/rooms/${roomId}/availability/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            check_in_date: checkIn,
-            check_out_date: checkOut
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to check availability');
-        }
+        const response = await fetch(
+          `http://localhost:8000/api/rooms/${roomId}/check-availability/`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              check_in: dateRange.from.toISOString().split('T')[0],
+              check_out: dateRange.to.toISOString().split('T')[0],
+            }),
+          }
+        );
 
         const data = await response.json();
-        setIsAvailable(data.is_available);
-      setPricing({
-        totalPrice: data.total_price || 0,
-        pricePerNight: data.base_price || 0,
-        cleaningFee: data.cleaning_fee || 0,
-        nights: data.nights || 0
-      });
-      setRoomDetails(data.room_details || null);
-        setBlockedDates(data.blocked_dates || []);
-      } catch (err) {
-        setError(err.message);
-        setIsAvailable(false);
-      } finally {
-        setIsLoading(false);
+
+        if (response.ok) {
+          setState({
+            isAvailable: data.available,
+            isLoading: false,
+            totalPrice: data.total_price || 0,
+            blockedDates: data.blocked_dates || [],
+            error: null,
+          });
+
+          if (!data.available) {
+            showToast('Selected dates are not available', 'warning');
+          }
+        } else {
+          setState(prev => ({
+            ...prev,
+            isLoading: false,
+            error: data.error || 'Failed to check availability',
+          }));
+          showToast(data.error || 'Failed to check availability', 'error');
+        }
+      } catch (error) {
+        setState(prev => ({
+          ...prev,
+          isLoading: false,
+          error: 'Network error. Please try again.',
+        }));
+        showToast('Network error. Please try again.', 'error');
       }
     };
 
-    checkAvailability();
-  }, [roomId, checkIn, checkOut]);
+    if (dateRange?.from && dateRange?.to) {
+      checkAvailability();
+    }
+  }, [roomId, dateRange, token, showToast]);
 
-  const formatBlockedDates = () => {
-    return blockedDates.map(date => new Date(date));
-  };
-
-  return {
-    isAvailable,
-    isLoading,
-    error,
-    pricing,
-    blockedDates: formatBlockedDates(),
-    roomDetails
-  };
-};
+  return state;
+}
 
 export default useAvailability;

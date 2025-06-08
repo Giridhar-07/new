@@ -1,280 +1,255 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  FaBed, 
-  FaUsers, 
-  FaWifi, 
-  FaArrowRight, 
+import {
+  FaBed,
+  FaUsers,
+  FaWifi,
+  FaArrowRight,
   FaSearch,
-  FaFilter
+  FaFilter,
 } from 'react-icons/fa';
+import useAuth from '../hooks/useAuth';
+import { useToast } from './ToastManager';
 import './Rooms.css';
 
 function Rooms() {
+  const { token } = useAuth();
+  const showToast = useToast();
+  
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     minPrice: '',
     maxPrice: '',
     capacity: '',
-    type: 'all'
+    roomType: '',
   });
-  const [searchTerm, setSearchTerm] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
 
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      fetchRooms();
-    }, 300); // Debounce search and filter updates
-
-    return () => clearTimeout(debounceTimer);
-  }, [filters, searchTerm]);
-
-  const fetchRooms = async () => {
+  const fetchRooms = useCallback(async () => {
     try {
-      let url = 'http://127.0.0.1:8000/api/rooms/';
-      const params = new URLSearchParams();
+      const queryParams = new URLSearchParams();
+      
+      if (filters.minPrice) queryParams.append('min_price', filters.minPrice);
+      if (filters.maxPrice) queryParams.append('max_price', filters.maxPrice);
+      if (filters.capacity) queryParams.append('capacity', filters.capacity);
+      if (filters.roomType) queryParams.append('room_type', filters.roomType);
 
-      // Add search parameter if there's a search term
-      if (searchTerm.trim()) {
-        params.append('search', searchTerm.trim());
-      }
+      const headers = {
+        'Content-Type': 'application/json',
+      };
 
-      // Add price range filters
-      if (filters.minPrice) {
-        const minPrice = parseFloat(filters.minPrice);
-        if (!isNaN(minPrice) && minPrice >= 0) {
-          params.append('min_price', minPrice);
-        }
-      }
-      if (filters.maxPrice) {
-        const maxPrice = parseFloat(filters.maxPrice);
-        if (!isNaN(maxPrice) && maxPrice >= 0) {
-          params.append('max_price', maxPrice);
-        }
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
       }
 
-      // Add capacity filter
-      if (filters.capacity) {
-        const capacity = parseInt(filters.capacity);
-        if (!isNaN(capacity) && capacity > 0) {
-          params.append('max_occupants', capacity);
-        }
+      const response = await fetch(
+        `http://localhost:8000/api/rooms/?${queryParams}`,
+        { headers }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch rooms');
       }
 
-      // Add room type filter
-      if (filters.type !== 'all') {
-        params.append('type', filters.type.toLowerCase());
-      }
-
-      if (params.toString()) {
-        url += `?${params.toString()}`;
-      }
-
-      const token = localStorage.getItem('access_token');
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setRooms(data);
-      }
+      const data = await response.json();
+      setRooms(data);
     } catch (error) {
-      console.error('Error fetching rooms:', error);
-      setRooms([]);
+      showToast('Failed to load rooms. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, token, showToast]);
+
+  useEffect(() => {
+    fetchRooms();
+  }, [fetchRooms]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     
-    // Validate input based on field type
     if (name === 'minPrice' || name === 'maxPrice') {
-      // Only allow positive numbers for price
-      if (value === '' || (parseFloat(value) >= 0)) {
-        setFilters(prev => ({ ...prev, [name]: value }));
-      }
-    } else if (name === 'capacity') {
-      // Only allow positive integers for capacity
-      if (value === '' || (parseInt(value) >= 1)) {
-        setFilters(prev => ({ ...prev, [name]: value }));
-      }
-    } else {
-      setFilters(prev => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    // Search is handled by useEffect with debounce
-  };
-
-  const handlePriceBlur = () => {
-    // Validate min price is less than max price
-    if (filters.minPrice && filters.maxPrice) {
-      const min = parseFloat(filters.minPrice);
-      const max = parseFloat(filters.maxPrice);
-      if (min > max) {
-        setFilters(prev => ({
+      if (value && parseFloat(value) >= 0) {
+        setFilters((prev) => ({
           ...prev,
-          minPrice: filters.maxPrice,
-          maxPrice: filters.minPrice
+          [name]: value,
         }));
       }
+    } else if (name === 'capacity') {
+      if (value && parseInt(value) >= 1) {
+        setFilters((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+      }
+    } else {
+      setFilters((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
     }
   };
 
-  const roomTypes = ['all', 'standard', 'deluxe', 'suite'];
+  const handleFilterSubmit = (e) => {
+    e.preventDefault();
+    
+    if (
+      filters.minPrice &&
+      filters.maxPrice &&
+      parseFloat(filters.minPrice) > parseFloat(filters.maxPrice)
+    ) {
+      showToast('Minimum price cannot be greater than maximum price', 'error');
+      return;
+    }
+
+    setLoading(true);
+    fetchRooms();
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      minPrice: '',
+      maxPrice: '',
+      capacity: '',
+      roomType: '',
+    });
+    setLoading(true);
+    fetchRooms();
+    showToast('Filters cleared', 'success');
+  };
 
   if (loading) {
-    return (
-      <div className="rooms-container">
-        <div className="loading-screen">Loading...</div>
-      </div>
-    );
+    return <div className="loading">Loading...</div>;
   }
 
   return (
     <div className="rooms-container">
-      <div className="rooms-content">
-        <div className="rooms-header">
-          <h1 className="rooms-title">Our Rooms</h1>
-          <p className="rooms-subtitle">
-            Discover our collection of luxurious rooms and suites
-          </p>
+      <div className="rooms-header">
+        <h2>Our Rooms</h2>
+        <p>Discover our collection of luxurious rooms and suites</p>
+        
+        <div className="filter-toggle">
+          <button onClick={() => setShowFilters(!showFilters)}>
+            <FaFilter />
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          </button>
         </div>
 
-        <div className="rooms-actions">
-          <form onSubmit={handleSearch} className="search-bar">
-            <FaSearch className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search rooms..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
+        {showFilters && (
+          <form className="filters" onSubmit={handleFilterSubmit}>
+            <div className="filter-row">
+              <div className="filter-group">
+                <label>Min Price (₹)</label>
+                <input
+                  type="number"
+                  name="minPrice"
+                  value={filters.minPrice}
+                  onChange={handleFilterChange}
+                  min="0"
+                />
+              </div>
+              
+              <div className="filter-group">
+                <label>Max Price (₹)</label>
+                <input
+                  type="number"
+                  name="maxPrice"
+                  value={filters.maxPrice}
+                  onChange={handleFilterChange}
+                  min="0"
+                />
+              </div>
+
+              <div className="filter-group">
+                <label>Guests</label>
+                <input
+                  type="number"
+                  name="capacity"
+                  value={filters.capacity}
+                  onChange={handleFilterChange}
+                  min="1"
+                />
+              </div>
+
+              <div className="filter-group">
+                <label>Room Type</label>
+                <select
+                  name="roomType"
+                  value={filters.roomType}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">All</option>
+                  <option value="standard">Standard</option>
+                  <option value="deluxe">Deluxe</option>
+                  <option value="suite">Suite</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="filter-actions">
+              <button type="submit" className="apply-filters">
+                <FaSearch /> Apply Filters
+              </button>
+              <button type="button" onClick={clearFilters} className="clear-filters">
+                Clear Filters
+              </button>
+            </div>
           </form>
+        )}
+      </div>
 
-          <div className="filters">
-            <div className="filter-group">
-              <FaFilter className="filter-icon" />
-              <select
-                name="type"
-                value={filters.type}
-                onChange={handleFilterChange}
-                className="filter-select"
-              >
-                {roomTypes.map(type => (
-                  <option key={type} value={type}>
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <input
-                type="number"
-                name="minPrice"
-                placeholder="Min Price"
-                value={filters.minPrice}
-                onChange={handleFilterChange}
-                onBlur={handlePriceBlur}
-                min="0"
-                step="1"
-                className="filter-input"
-              />
-            </div>
-
-            <div className="filter-group">
-              <input
-                type="number"
-                name="maxPrice"
-                placeholder="Max Price"
-                value={filters.maxPrice}
-                onChange={handleFilterChange}
-                onBlur={handlePriceBlur}
-                min="0"
-                step="1"
-                className="filter-input"
-              />
-            </div>
-
-            <div className="filter-group">
-              <input
-                type="number"
-                name="capacity"
-                placeholder="Guests"
-                value={filters.capacity}
-                onChange={handleFilterChange}
-                className="filter-input"
-                min="1"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="rooms-grid">
-          {rooms.map((room) => (
+      <div className="rooms-grid">
+        {rooms.length > 0 ? (
+          rooms.map((room) => (
             <div key={room.id} className="room-card">
-              <div className="room-image-container">
+              <div className="room-image">
                 <img
                   src={room.image ? `http://127.0.0.1:8000${room.image}` : '/images/default-room.jpg'}
                   alt={room.name}
-                  className="room-image"
-                  onError={(e) => {
-                    e.target.src = '/images/default-room.jpg';
-                  }}
                 />
-              <div className="room-tag">
-                {room.room_type ? room.room_type.charAt(0).toUpperCase() + room.room_type.slice(1) : ''}
               </div>
-              </div>
+              
+              <div className="room-info">
+                <h3>{room.name}</h3>
+                <p className="room-type">
+                  {room.room_type.charAt(0).toUpperCase() + room.room_type.slice(1)}
+                </p>
 
-              <div className="room-content">
-                <h3 className="room-name">{room.name}</h3>
-                <p className="room-description">{room.description}</p>
-
-                <div className="room-details">
-                  <div className="detail-item">
-                    <FaBed className="detail-icon" />
+                <div className="room-features">
+                  <div className="feature">
+                    <FaBed />
                     <span>{room.num_beds} {room.num_beds > 1 ? 'Beds' : 'Bed'}</span>
                   </div>
-                  <div className="detail-item">
-                    <FaUsers className="detail-icon" />
-                    <span>{room.max_occupants} Guests</span>
+                  <div className="feature">
+                    <FaUsers />
+                    <span>Max {room.capacity} Guests</span>
                   </div>
-                  <div className="detail-item">
-                    <FaWifi className="detail-icon" />
-                    <span>{room.wifi ? 'Free WiFi' : 'No WiFi'}</span>
+                  <div className="feature">
+                    <FaWifi />
+                    <span>Free WiFi</span>
                   </div>
                 </div>
 
                 <div className="room-price">
-                  <span className="price-amount">${room.price}</span>
-                  <span className="price-period">per night</span>
+                  <span className="price">₹{room.price}</span>
+                  <span className="per-night">per night</span>
                 </div>
 
-                <Link 
+                <Link
                   to={`/rooms/${room.id}`}
                   className="view-details-button"
                 >
-                  View Details
-                  <FaArrowRight />
+                  View Details <FaArrowRight />
                 </Link>
               </div>
             </div>
-          ))}
-        </div>
-
-        {rooms.length === 0 && (
-          <div className="no-results">
-            <h3>No rooms found matching your criteria</h3>
-            <p>Try adjusting your filters or search terms</p>
+          ))
+        ) : (
+          <div className="no-rooms">
+            <p>No rooms found matching your criteria.</p>
+            <button onClick={clearFilters} className="clear-filters">
+              Clear Filters
+            </button>
           </div>
         )}
       </div>
