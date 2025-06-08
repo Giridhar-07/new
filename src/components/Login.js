@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
 
@@ -7,11 +7,52 @@ function Login({ setIsAuthenticated }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [attemptsRemaining, setAttemptsRemaining] = useState(5);
+  const [isLocked, setIsLocked] = useState(false);
   const navigate = useNavigate();
+
+  // Check if account is locked
+  useEffect(() => {
+    const lockoutEnd = localStorage.getItem('lockoutEnd');
+    if (lockoutEnd && new Date(lockoutEnd) > new Date()) {
+      setIsLocked(true);
+      const timeLeft = Math.ceil((new Date(lockoutEnd) - new Date()) / 1000 / 60);
+      setError(`Account is temporarily locked. Please try again in ${timeLeft} minutes.`);
+    }
+  }, []);
+
+  const refreshToken = async () => {
+    try {
+      const refresh = localStorage.getItem('refresh_token');
+      const response = await fetch('http://127.0.0.1:8000/api/refresh-token/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          refresh,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        localStorage.setItem('access_token', data.access);
+        localStorage.setItem('token_expiry', data.token_expiry);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      return false;
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (isLocked) {
+      return;
+    }
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/login/', {
@@ -25,47 +66,6 @@ function Login({ setIsAuthenticated }) {
         }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('access_token', data.access);
-        localStorage.setItem('refresh_token', data.refresh);
-        localStorage.setItem('user_id', data.user_id);
-        localStorage.setItem('customer_id', data.customer_id);
-        localStorage.setItem('is_staff', data.is_staff);
-        setIsAuthenticated(true);
-        if (data.is_staff) {
-          navigate('/dashboard');
-        } else {
-          navigate('/');
-        }
-      } else {
-        setError(data.error || 'Login failed. Please check your credentials.');
-      }
-    } catch (err) {
-      setError('An error occurred. Please try again later.');
-    }
-  };
-
-  return (
-    <div className="login-container">
-      <div className="background-shapes">
-        <div className="shape"></div>
-        <div className="shape"></div>
-        <div className="shape"></div>
-      </div>
-      <div className="login-form-container">
-        <form onSubmit={handleSubmit} className="login-form">
-          <h2 className="login-title">Welcome Back</h2>
-          <p className="login-subtitle">Enter your credentials to access your account</p>
-
-          {error && <div className="error-message">{error}</div>}
-
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">
-              Email Address
-            </label>
-            <input
               type="email"
               id="email"
               className="form-control"

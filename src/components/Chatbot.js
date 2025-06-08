@@ -1,10 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { FaPaperPlane, FaTimes, FaRobot, FaComments } from 'react-icons/fa';
 import { sendMessageToGemini } from '../services/geminiService';
+import useTypingEffect from '../hooks/useTypingEffect';
 import './Chatbot.css';
 
 function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const [typingMessage, setTypingMessage] = useState('');
+  const { displayedText, isComplete } = useTypingEffect(typingMessage, 30);
   const [messages, setMessages] = useState([
     {
       type: 'bot',
@@ -16,16 +19,22 @@ function Chatbot() {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
     if (isOpen && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [messages, isOpen]);
+  }, [messages, isOpen, scrollToBottom]);
+
+  useEffect(() => {
+    if (typingMessage) {
+      scrollToBottom();
+    }
+  }, [typingMessage, displayedText, scrollToBottom]);
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
@@ -33,7 +42,7 @@ function Chatbot() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || isTyping || typingMessage) return;
 
     // Add user message
     const userMessage = {
@@ -47,11 +56,17 @@ function Chatbot() {
     try {
       // Get bot response
       const response = await sendMessageToGemini(inputMessage);
+      setTypingMessage(response);
+      
+      // Wait for typing animation to complete
+      await new Promise(resolve => setTimeout(resolve, response.length * 30));
+      
       const botMessage = {
         type: 'bot',
         content: response
       };
       setMessages(prev => [...prev, botMessage]);
+      setTypingMessage('');
     } catch (error) {
       console.error('Error getting bot response:', error);
       const errorMessage = {
@@ -66,7 +81,7 @@ function Chatbot() {
   };
 
   const formatMessage = (content) => {
-    // Split content into paragraphs
+    if (!content) return null;
     return content.split('\n').map((paragraph, index) => (
       paragraph ? <p key={index}>{paragraph}</p> : <br key={index} />
     ));
@@ -82,7 +97,11 @@ function Chatbot() {
         {isOpen ? <FaTimes /> : <FaComments />}
       </button>
 
-      <div className={`chatbot-container ${isOpen ? 'open' : ''}`}>
+      <div 
+        className={`chatbot-container ${isOpen ? 'open' : ''}`}
+        role="dialog"
+        aria-label="Chat with hotel assistant"
+      >
         <div className="chatbot-header">
           <div className="chatbot-title">
             <FaRobot className="bot-icon" />
@@ -102,6 +121,7 @@ function Chatbot() {
             <div
               key={index}
               className={`message ${message.type} ${message.isError ? 'error' : ''}`}
+              role={message.type === 'bot' ? 'log' : 'status'}
             >
               {message.type === 'bot' && (
                 <div className="bot-avatar">
@@ -113,7 +133,17 @@ function Chatbot() {
               </div>
             </div>
           ))}
-          {isTyping && (
+          {typingMessage && (
+            <div className="message bot typing">
+              <div className="bot-avatar">
+                <FaRobot />
+              </div>
+              <div className="message-content">
+                {formatMessage(displayedText)}
+              </div>
+            </div>
+          )}
+          {isTyping && !typingMessage && (
             <div className="message bot">
               <div className="bot-avatar">
                 <FaRobot />
@@ -136,11 +166,14 @@ function Chatbot() {
             placeholder="Type your message..."
             ref={inputRef}
             className="message-input"
+            disabled={isTyping || typingMessage}
+            aria-label="Message input"
           />
           <button 
             type="submit"
             className="send-button"
-            disabled={!inputMessage.trim() || isTyping}
+            disabled={!inputMessage.trim() || isTyping || typingMessage}
+            aria-label="Send message"
           >
             <FaPaperPlane />
           </button>

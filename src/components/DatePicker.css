@@ -1,0 +1,128 @@
+.date-picker-container {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 1rem;
+  margin: 1rem 0;
+  transition: all 0.3s ease;
+}
+
+.date-picker-container:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.rdp {
+  --rdp-cell-size: 40px;
+  --rdp-accent-color: #3b82f6;
+  --rdp-background-color: #e6f3ff;
+  --rdp-accent-color-dark: #2563eb;
+  --rdp-background-color-dark: #90cdf4;
+  --rdp-outline: 2px solid var(--rdp-accent-color);
+  --rdp-outline-selected: 2px solid var(--rdp-accent-color);
+  margin: 0;
+}
+
+.rdp-day_today {
+  font-weight: bold;
+  color: var(--rdp-accent-color);
+}
+
+.rdp-day_selected {
+  background-color: var(--rdp-accent-color);
+  color: white;
+}
+
+.rdp-day_selected:hover {
+  background-color: var(--rdp-accent-color-dark);
+}
+
+.rdp-day:hover:not(.rdp-day_selected):not(.rdp-day_disabled) {
+  background-color: var(--rdp-background-color);
+}
+
+.rdp-day_disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.date-picker-footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.date-picker-footer p {
+  margin: 0.5rem 0;
+  text-align: center;
+}
+
+.date-picker-info {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.rdp-months {
+  display: flex;
+  justify-content: center;
+}
+
+.rdp-month {
+  margin: 0 1rem;
+}
+
+.rdp-nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
+}
+
+.rdp-nav_button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--rdp-accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.rdp-nav_button:hover {
+  background-color: var(--rdp-background-color);
+}
+
+.rdp-nav_button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rdp-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.5rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.rdp-head_cell {
+  font-weight: 600;
+  color: #4b5563;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .rdp {
+    --rdp-cell-size: 35px;
+  }
+
+  .rdp-month {
+    margin: 0;
+  }
+}

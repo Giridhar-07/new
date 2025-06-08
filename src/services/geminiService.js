@@ -1,5 +1,10 @@
 const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
 const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // 1 second
+
+// Initialize conversation history
+let conversationHistory = [];
 
 const systemContext = `You are a helpful hotel assistant for LuxuryStay Hotel. Your role is to:
 - Provide information about hotel amenities and services
@@ -19,8 +24,15 @@ You have access to this basic information:
 - Location: City Center
 `;
 
-export const sendMessageToGemini = async (message) => {
+export const sendMessageToGemini = async (message, retryCount = 0) => {
+  if (!GEMINI_API_KEY) {
+    throw new Error('Gemini API key is not configured');
+  }
+
   try {
+    // Add user message to history
+    conversationHistory.push({ role: 'user', content: message });
+
     const response = await fetch(`${API_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
@@ -65,7 +77,12 @@ export const sendMessageToGemini = async (message) => {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to get response from Gemini');
+      if (retryCount < MAX_RETRIES) {
+        console.log(`Attempt ${retryCount + 1} failed, retrying...`);
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (retryCount + 1)));
+        return sendMessageToGemini(message, retryCount + 1);
+      }
+      throw new Error(`Failed to get response from Gemini: ${response.status}`);
     }
 
     const data = await response.json();
@@ -75,7 +92,17 @@ export const sendMessageToGemini = async (message) => {
     }
 
     const responseText = data.candidates[0].content.parts[0].text;
-    return formatResponse(responseText);
+    const formattedResponse = formatResponse(responseText);
+    
+    // Add bot response to history
+    conversationHistory.push({ role: 'assistant', content: formattedResponse });
+    
+    // Keep only the last 10 messages to prevent context from getting too large
+    if (conversationHistory.length > 10) {
+      conversationHistory = conversationHistory.slice(-10);
+    }
+    
+    return formattedResponse;
   } catch (error) {
     console.error('Error calling Gemini API:', error);
     throw error;
@@ -102,15 +129,34 @@ export const isGeminiConfigured = () => {
 
 // Function to handle API errors
 export const handleGeminiError = (error) => {
+  if (!GEMINI_API_KEY) {
+    return 'The AI service is not properly configured. Please set up the REACT_APP_GEMINI_API_KEY environment variable.';
+  }
+  
   if (error.message.includes('API key')) {
-    return 'The AI service is not properly configured. Please contact support.';
+    return 'The AI service is not properly configured. Please check your API key.';
   }
   
   if (error.message.includes('rate limit')) {
     return 'The service is experiencing high traffic. Please try again in a moment.';
   }
   
-  return 'I apologize, but I\'m having trouble processing your request. Please try again.';
+  if (error.message.includes('429')) {
+    return 'Too many requests. Please wait a moment before trying again.';
+  }
+
+  console.error('Gemini API Error:', error);
+  return 'I apologize, but I\'m having trouble processing your request. Please try again in a moment.';
+};
+
+// Get conversation history
+export const getConversationHistory = () => {
+  return conversationHistory;
+};
+
+// Clear conversation history
+export const clearConversationHistory = () => {
+  conversationHistory = [];
 };
 
 // Function to validate messages before sending

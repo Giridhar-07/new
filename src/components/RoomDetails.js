@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaBed, FaUsers, FaWifi, FaTv, FaSnowflake, FaParking, FaArrowRight } from 'react-icons/fa';
+import { FaBed, FaUsers, FaWifi, FaTv, FaSnowflake, FaParking, FaArrowRight, FaCalendarAlt, FaClock } from 'react-icons/fa';
+import { format } from 'date-fns';
+import DatePicker from './DatePicker';
+import useAvailability from '../hooks/useAvailability';
 import './RoomDetails.css';
 
 function RoomDetails() {
@@ -10,11 +13,13 @@ function RoomDetails() {
   const [loading, setLoading] = useState(true);
   const headerRef = useRef(null);
   const amenitiesRef = useRef(null);
-  const [bookingDates, setBookingDates] = useState({
-    checkIn: '',
-    checkOut: '',
-    guests: 1,
-  });
+  const [dateRange, setDateRange] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  const { isAvailable, isLoading: availabilityLoading, totalPrice, blockedDates, error: availabilityError } = useAvailability(
+    id,
+    dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : null,
+    dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : null
+  );
 
   useEffect(() => {
     // Parallax effect for header image
@@ -83,6 +88,16 @@ function RoomDetails() {
 
   const handleBookingSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!isAvailable) {
+      alert('Selected dates are not available');
+      return;
+    }
+
+    if (!dateRange.from || !dateRange.to) {
+      alert('Please select check-in and check-out dates');
+      return;
+    }
 
     try {
       const token = localStorage.getItem('access_token');
@@ -92,12 +107,12 @@ function RoomDetails() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          room_id: id,
-          check_in_date: bookingDates.checkIn,
-          check_out_date: bookingDates.checkOut,
-          guest_count: bookingDates.guests,
-        }),
+          body: JSON.stringify({
+            room_id: id,
+            check_in_date: format(dateRange.from, 'yyyy-MM-dd'),
+            check_out_date: format(dateRange.to, 'yyyy-MM-dd'),
+            guest_count: guests,
+          }),
       });
 
       if (response.ok) {
@@ -176,73 +191,70 @@ function RoomDetails() {
 
             <div className="booking-section">
               <h2 className="section-title">Book Now</h2>
+              {availabilityError && (
+                <div className="error-message">
+                  {availabilityError}
+                </div>
+              )}
               <form onSubmit={handleBookingSubmit} className="booking-form">
-                <div className="form-group">
-                  <label className="form-label">Check-in Date</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    value={bookingDates.checkIn}
-                    onChange={(e) => {
-                      const element = e.target;
-                      element.style.transform = 'scale(1.02)';
-                      setTimeout(() => {
-                        element.style.transform = 'scale(1)';
-                      }, 150);
-                      setBookingDates((prev) => ({
-                        ...prev,
-                        checkIn: e.target.value,
-                      }));
-                    }}
-                    required
+                <div className="date-range-section">
+                  <h3 className="section-subtitle">
+                    <FaCalendarAlt /> Select Dates
+                  </h3>
+                  <DatePicker
+                    selectedRange={dateRange}
+                    onSelect={setDateRange}
+                    blockedDates={blockedDates}
+                    minNights={1}
+                    maxNights={30}
                   />
                 </div>
-
-                <div className="form-group">
-                  <label className="form-label">Check-out Date</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    value={bookingDates.checkOut}
-                    onChange={(e) => {
-                      const element = e.target;
-                      element.style.transform = 'scale(1.02)';
-                      setTimeout(() => {
-                        element.style.transform = 'scale(1)';
-                      }, 150);
-                      setBookingDates((prev) => ({
-                        ...prev,
-                        checkOut: e.target.value,
-                      }));
-                    }}
-                    required
-                  />
+                <div className="guest-section">
+                  <h3 className="section-subtitle">
+                    <FaUsers /> Number of Guests
+                  </h3>
+                  <div className="guest-selector">
+                    <button
+                      type="button"
+                      onClick={() => setGuests(prev => Math.max(1, prev - 1))}
+                      disabled={guests <= 1}
+                      className="guest-button"
+                    >
+                      -
+                    </button>
+                    <span className="guest-count">{guests}</span>
+                    <button
+                      type="button"
+                      onClick={() => setGuests(prev => Math.min(room.capacity, prev + 1))}
+                      disabled={guests >= room.capacity}
+                      className="guest-button"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <p className="max-guests">Maximum {room.capacity} guests</p>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Number of Guests</label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    value={bookingDates.guests}
-                    onChange={(e) => {
-                      const element = e.target;
-                      element.style.transform = 'scale(1.02)';
-                      setTimeout(() => {
-                        element.style.transform = 'scale(1)';
-                      }, 150);
-                      setBookingDates((prev) => ({
-                        ...prev,
-                        guests: parseInt(e.target.value),
-                      }));
-                    }}
-                    min="1"
-                    max={room.capacity}
-                    required
-                  />
-                </div>
+                {dateRange.from && dateRange.to && (
+                  <div className="price-summary">
+                    <h3 className="section-subtitle">
+                      <FaClock /> Stay Duration
+                    </h3>
+                    <p className="duration">
+                      {Math.ceil((dateRange.to - dateRange.from) / (1000 * 60 * 60 * 24))} nights
+                    </p>
+                    <div className="total-price">
+                      <span>Total Price:</span>
+                      <span className="price">${totalPrice}</span>
+                    </div>
+                  </div>
+                )}
 
-                <button type="submit" className="book-now-button">
+                <button 
+                  type="submit" 
+                  className={`book-now-button ${!isAvailable || availabilityLoading ? 'disabled' : ''}`}
+                  disabled={!isAvailable || availabilityLoading || !dateRange.from || !dateRange.to}
+                >
                   <span>Book Now</span>
                   <FaArrowRight />
                 </button>
