@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { showToast } from "../components/ToastManager";
+import { useToast } from "../components/ToastManager";
 import "./Contact.css";
 
 function Contact() {
@@ -9,6 +9,7 @@ function Contact() {
     message: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const showToast = useToast();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
