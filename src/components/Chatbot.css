@@ -5,7 +5,7 @@
   width: 60px;
   height: 60px;
   border-radius: 30px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   color: white;
   border: none;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -41,7 +41,8 @@
   right: 2rem;
   width: 380px;
   height: 600px;
-  background: white;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(10px);
   border-radius: 1.5rem;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   display: flex;
@@ -60,7 +61,7 @@
 
 .chatbot-header {
   padding: 1.5rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -129,17 +130,17 @@
 }
 
 .message-content {
-  background: #f3f4f6;
+  background: rgba(255, 255, 255, 0.1);
   padding: 1rem;
   border-radius: 1rem;
-  color: #1e293b;
+  color: #e2e8f0;
   line-height: 1.5;
   transform-origin: left bottom;
   animation: scaleIn 0.2s ease-out forwards;
 }
 
 .message.user .message-content {
-  background: #3b82f6;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   transform-origin: right bottom;
 }
@@ -177,20 +178,22 @@
 
 .input-form {
   padding: 1.5rem;
-  border-top: 1px solid rgba(59, 130, 246, 0.1);
+  border-top: 1px solid rgba(59, 130, 246, 0.2);
   display: flex;
   gap: 1rem;
-  background: white;
+  background: rgba(15, 23, 42, 0.8);
 }
 
 .message-input {
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 2px solid rgba(59, 130, 246, 0.1);
+  border: 2px solid rgba(59, 130, 246, 0.2);
   border-radius: 0.75rem;
   outline: none;
   font-size: 1rem;
   transition: all 0.3s ease;
+  background: rgba(30, 41, 59, 0.5);
+  color: white;
 }
 
 .message-input:focus {
@@ -200,7 +203,7 @@
 
 .send-button {
   padding: 0.75rem;
-  background: #3b82f6;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   border: none;
   border-radius: 0.75rem;

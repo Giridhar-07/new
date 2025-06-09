@@ -1,101 +1,147 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import './Header.css';
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { FaBars, FaTimes, FaUser, FaHotel } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+import useAuth from "../hooks/useAuth";
+import "./Header.css";
 
-function Header({ isAuthenticated, onLogout }) {
+function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [userRole, setUserRole] = useState('');
-  const navigate = useNavigate();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
+  const location = useLocation();
 
   useEffect(() => {
-    const isStaff = localStorage.getItem('is_staff') === 'true';
-    setUserRole(isStaff ? 'staff' : 'customer');
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleLogout = async () => {
-    await onLogout();
+    await logout();
     setIsMenuOpen(false);
-    navigate('/login');
   };
+
+  const navLinks = [
+    { to: "/", text: "Home" },
+    { to: "/rooms", text: "Rooms" },
+    { to: "/contact", text: "Contact" },
+  ];
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   return (
-    <header className="header">
-      <nav className="nav-container">
-        <Link to="/" className="logo">
-          LuxStay
+    <motion.header 
+      className={`header ${isScrolled ? "scrolled" : ""}`}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ type: "spring", stiffness: 100, damping: 20 }}
+    >
+      <motion.div 
+        className="logo"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <Link to="/">
+          <FaHotel className="logo-icon" />
+          <span>Hotel Paradise</span>
         </Link>
+      </motion.div>
 
-        <button 
-          className={`hamburger ${isMenuOpen ? 'active' : ''}`} 
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
+      <motion.button 
+        className="menu-toggle"
+        onClick={toggleMenu}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+      >
+        <motion.div
+          animate={{ rotate: isMenuOpen ? 180 : 0 }}
+          transition={{ duration: 0.3 }}
         >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+          {isMenuOpen ? <FaTimes /> : <FaBars />}
+        </motion.div>
+      </motion.button>
 
-        <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
-          <Link to="/" onClick={() => setIsMenuOpen(false)}>
-            Home
-          </Link>
-          
-          {isAuthenticated && (
-            <Link to="/rooms" onClick={() => setIsMenuOpen(false)}>
-              Rooms
-            </Link>
-          )}
-          
-          <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
-            Contact
-          </Link>
+      <AnimatePresence>
+        <motion.nav 
+          className={`nav-menu ${isMenuOpen ? "active" : ""}`}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+        <motion.ul>
+          {navLinks.map((link, index) => (
+            <motion.li 
+              key={link.to}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <Link
+                to={link.to}
+                className={location.pathname === link.to ? "active" : ""}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <motion.span
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {link.text}
+                </motion.span>
+              </Link>
+            </motion.li>
+          ))}
+        </motion.ul>
 
-          {isAuthenticated && userRole === 'staff' && (
-            <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
-              Dashboard
-            </Link>
-          )}
-
-          {isAuthenticated && (
-            <Link to="/chat" onClick={() => setIsMenuOpen(false)}>
-              Chat Assistant
-            </Link>
-          )}
-
-          <div className="auth-buttons">
-            {isAuthenticated ? (
-              <button 
-                onClick={handleLogout} 
+        <motion.div 
+          className="auth-buttons"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          {isAuthenticated ? (
+            <>
+              <motion.div 
+                className="welcome-text"
+                whileHover={{ scale: 1.05 }}
+              >
+                <FaUser className="user-icon" />
+                <span>Welcome, {user?.username}</span>
+              </motion.div>
+              <motion.button 
                 className="logout-button"
+                onClick={handleLogout}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Logout
-              </button>
-            ) : (
-              <>
-                <Link 
-                  to="/login" 
-                  className="login-button"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Login
-                </Link>
-                <Link 
-                  to="/register" 
-                  className="register-button"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Register
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
-    </header>
+              </motion.button>
+            </>
+          ) : (
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Link
+                to="/login"
+                className="login-button"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Login
+              </Link>
+            </motion.div>
+          )}
+        </motion.div>
+        </motion.nav>
+      </AnimatePresence>
+    </motion.header>
   );
 }
 
