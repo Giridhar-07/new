@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { FaTimes, FaRobot, FaUser, FaPaperPlane } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-import { generateResponse } from "../services/geminiService";
+import { sendMessageToGemini, handleGeminiError, validateMessage } from "../services/geminiService";
 import "./Chatbot.css";
 
 function Chatbot() {
@@ -56,7 +56,8 @@ function Chatbot() {
     setIsTyping(true);
 
     try {
-      const response = await generateResponse(currentInput);
+      const validatedMessage = validateMessage(currentInput);
+      const response = await sendMessageToGemini(validatedMessage);
       setIsTyping(false);
 
       if (response) {
@@ -77,7 +78,7 @@ function Chatbot() {
     } catch (error) {
       setIsTyping(false);
       const errorMessage = {
-        content: "I apologize, but I'm having trouble processing your request. Please try again.",
+        content: handleGeminiError(error),
         type: "bot",
       };
       setMessages((prev) => [...prev, errorMessage]);
