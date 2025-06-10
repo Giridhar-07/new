@@ -10,11 +10,13 @@ import {
 } from 'react-icons/fa';
 import useAuth from '../hooks/useAuth';
 import { useToast } from './ToastManager';
+import { useNavigate } from 'react-router-dom';
 import './Rooms.css';
 
 function Rooms() {
   const { token } = useAuth();
-  const showToast = useToast();
+  const { addToast } = useToast();
+  const navigate = useNavigate();
   
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,11 +57,11 @@ function Rooms() {
       const data = await response.json();
       setRooms(data);
     } catch (error) {
-      showToast('Failed to load rooms. Please try again.', 'error');
+      addToast('Failed to load rooms. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
-  }, [filters, token, showToast]);
+  }, [filters, token, addToast]);
 
   useEffect(() => {
     fetchRooms();
@@ -98,7 +100,7 @@ function Rooms() {
       filters.maxPrice &&
       parseFloat(filters.minPrice) > parseFloat(filters.maxPrice)
     ) {
-      showToast('Minimum price cannot be greater than maximum price', 'error');
+      addToast('Minimum price cannot be greater than maximum price', 'error');
       return;
     }
 
@@ -115,19 +117,12 @@ function Rooms() {
     });
     setLoading(true);
     fetchRooms();
-    showToast('Filters cleared', 'success');
+    addToast('Filters cleared', 'success');
   };
 
   if (!token) {
-    return (
-      <div className="auth-required">
-        <h2>Authentication Required</h2>
-        <p>Please login to view our exclusive room collection.</p>
-        <Link to="/login" className="login-redirect-button">
-          Login to Continue
-        </Link>
-      </div>
-    );
+    navigate('/login', { state: { from: '/rooms' } });
+    return null;
   }
 
   if (loading) {

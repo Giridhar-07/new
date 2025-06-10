@@ -6,8 +6,8 @@ const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-// Keep track of the conversation
-let conversationHistory = [];
+// Keep track of the chat
+let chat = null;
 
 const systemContext = `You are a helpful hotel assistant for LuxuryStay Hotel. Your role is to:
 - Provide information about hotel amenities and services
@@ -45,6 +45,8 @@ export const validateMessage = (message) => {
  * Handles errors from the Gemini service
  */
 export const handleGeminiError = (error) => {
+  console.error("Gemini service error:", error);
+
   if (!GEMINI_API_KEY) {
     return "The AI service is not properly configured. Please try again later.";
   }
@@ -57,12 +59,38 @@ export const handleGeminiError = (error) => {
     return "Your message is too long. Please keep it shorter.";
   }
 
-  if (error.message.includes("rate limit")) {
+  if (error.message.includes("rate limit") || error.message.includes("429")) {
     return "We're receiving many requests. Please try again in a moment.";
   }
 
-  console.error("Gemini service error:", error);
+  if (error.message.includes("not found") || error.message.includes("404")) {
+    return "The AI service is temporarily unavailable. Please try again later.";
+  }
+
   return "I apologize, but I'm having trouble processing your request. Please try again.";
+};
+
+/**
+ * Initializes a new chat session
+ */
+export const startNewChat = async () => {
+  try {
+    if (!chat) {
+      chat = model.startChat({
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 500,
+        }
+      });
+
+      // Initialize with context
+      await chat.sendMessage(systemContext);
+    }
+    return true;
+  } catch (error) {
+    console.error("Failed to start chat:", error);
+    return false;
+  }
 };
 
 /**
@@ -70,50 +98,29 @@ export const handleGeminiError = (error) => {
  */
 export const sendMessageToGemini = async (userMessage) => {
   try {
+    // Validate the message
     const validatedMessage = validateMessage(userMessage);
 
-    // Add user message to history
-    conversationHistory.push({ role: "user", parts: validatedMessage });
-
-    // Prepare the complete message with context
-    const fullMessage = `${systemContext}\n\nPrevious conversation:\n${
-      conversationHistory
-        .slice(-4)
-        .map(msg => `${msg.role}: ${msg.parts}`)
-        .join("\n")
-    }\n\nUser: ${validatedMessage}`;
-
-    // Get the response from Gemini
-    const result = await model.generateContent(fullMessage);
-    const response = await result.response;
-    const text = response.text();
-
-    // Add AI response to history
-    conversationHistory.push({ role: "model", parts: text });
-
-    // Keep history manageable
-    if (conversationHistory.length > 10) {
-      conversationHistory = conversationHistory.slice(-10);
+    // Start a new chat if none exists
+    if (!chat) {
+      await startNewChat();
     }
 
-    return text;
+    // Send the message with context
+    const result = await chat.sendMessage(validatedMessage);
+    const response = await result.response;
+    
+    return response.text();
   } catch (error) {
-    const errorMessage = handleGeminiError(error);
     console.error("Error in Gemini service:", error);
-    return errorMessage;
+    return handleGeminiError(error);
   }
 };
 
 /**
- * Clears the conversation history
+ * Clears the current chat session
  */
 export const clearConversationHistory = () => {
-  conversationHistory = [];
-};
-
-/**
- * Gets the current conversation history
- */
-export const getConversationHistory = () => {
-  return [...conversationHistory];
+  chat = null;
+  startNewChat();
 };

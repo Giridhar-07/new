@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import { useToast } from "../components/ToastManager";
 import "./Login.css";
@@ -13,6 +13,8 @@ function Login() {
   const { login } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || "/";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,12 +29,15 @@ function Login() {
     setIsLoading(true);
 
     try {
-      const success = await login(credentials);
-      if (success) {
-        addToast("Login successful!", "success");
-        navigate("/");
+      const result = await login(credentials);
+      if (result.success) {
+        addToast(`Welcome back${result.user?.first_name ? ', ' + result.user.first_name : ''}!`, 'success');
+        navigate(from, { replace: true });
+      } else {
+        addToast(result.error || 'Login failed', 'error');
       }
-    } catch (error) {
+  } catch (error) {
+    console.error("Login error:", error);
       let errorMessage = "Failed to login. Please try again.";
       
       if (error.response?.status === 401) {
@@ -50,7 +55,11 @@ function Login() {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h2>Login</h2>
+        <h2>Welcome Back</h2>
+        <p className="login-subtitle">Access your hotel account</p>
+        <div className="login-divider">
+          <span>Please sign in to continue</span>
+        </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="username">Username:</label>
@@ -74,7 +83,14 @@ function Login() {
               required
             />
           </div>
-          <button type="submit" className="submit-button" disabled={isLoading}>
+          <div className="forgot-password">
+            <Link to="/forgot-password">Forgot your password?</Link>
+          </div>
+          <button 
+            type="submit" 
+            className={`submit-button ${isLoading ? 'loading' : ''}`} 
+            disabled={isLoading}
+          >
             {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>

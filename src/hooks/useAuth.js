@@ -80,7 +80,7 @@ function useAuth() {
     }
   }, [checkAuth]);
 
-  const login = async (username, password) => {
+  const login = async ({ username, password }) => {
     try {
       setIsLoading(true);
       const response = await fetch('http://localhost:8000/api/login/', {
@@ -144,6 +144,40 @@ function useAuth() {
     navigate('/');
   };
 
+  const register = async ({ username, email, password }) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('http://localhost:8000/api/register/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showToast('Registration successful! Please login.', 'success');
+        return true;
+      } else {
+        const errorMessage = data.detail || 
+          Object.values(data).flat().join(' ');
+        showToast(errorMessage, 'error');
+        return false;
+      }
+    } catch (error) {
+      showToast('Network error. Please try again.', 'error');
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     isAuthenticated,
     setIsAuthenticated,
@@ -151,6 +185,7 @@ function useAuth() {
     user,
     login,
     logout,
+    register,
     token: localStorage.getItem('accessToken'),
   };
 }
