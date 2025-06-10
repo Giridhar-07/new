@@ -1,9 +1,12 @@
-const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
-const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 second
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Initialize conversation history
+const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
+
+// Create and configure the Gemini AI instance
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+// Keep track of the conversation
 let conversationHistory = [];
 
 const systemContext = `You are a helpful hotel assistant for LuxuryStay Hotel. Your role is to:
@@ -14,160 +17,103 @@ const systemContext = `You are a helpful hotel assistant for LuxuryStay Hotel. Y
 - Assist with special requests and requirements
 - Maintain a professional, friendly, and helpful tone
 - Keep responses concise but informative
-- If you can't help with something, direct users to contact hotel staff
 
-You have access to this basic information:
-- Hotel Name: LuxuryStay Hotel
+Hotel Information:
+- Name: LuxuryStay Hotel
 - Room Types: Standard, Deluxe, and Suite
 - Amenities: Pool, Spa, Gym, Restaurant, Free WiFi, Parking
 - Check-in: 3 PM, Check-out: 11 AM
 - Location: City Center
 `;
 
-export const sendMessageToGemini = async (message, retryCount = 0) => {
-  if (!GEMINI_API_KEY) {
-    throw new Error('Gemini API key is not configured');
+/**
+ * Validates the user message
+ */
+export const validateMessage = (message) => {
+  if (!message || message.trim().length === 0) {
+    throw new Error("Message cannot be empty");
   }
 
+  if (message.length > 500) {
+    throw new Error("Message is too long. Please keep it under 500 characters.");
+  }
+
+  return message.trim();
+};
+
+/**
+ * Handles errors from the Gemini service
+ */
+export const handleGeminiError = (error) => {
+  if (!GEMINI_API_KEY) {
+    return "The AI service is not properly configured. Please try again later.";
+  }
+
+  if (error.message.includes("empty")) {
+    return "Please enter a message.";
+  }
+
+  if (error.message.includes("too long")) {
+    return "Your message is too long. Please keep it shorter.";
+  }
+
+  if (error.message.includes("rate limit")) {
+    return "We're receiving many requests. Please try again in a moment.";
+  }
+
+  console.error("Gemini service error:", error);
+  return "I apologize, but I'm having trouble processing your request. Please try again.";
+};
+
+/**
+ * Sends a message to the Gemini AI model
+ */
+export const sendMessageToGemini = async (userMessage) => {
   try {
+    const validatedMessage = validateMessage(userMessage);
+
     // Add user message to history
-    conversationHistory.push({ role: 'user', content: message });
+    conversationHistory.push({ role: "user", parts: validatedMessage });
 
-    const response = await fetch(`${API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [
-              {
-                text: `${systemContext}\n\nUser message: ${message}`
-              }
-            ]
-          }
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 1024,
-        },
-        safetySettings: [
-          {
-            category: 'HARM_CATEGORY_HARASSMENT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-          },
-          {
-            category: 'HARM_CATEGORY_HATE_SPEECH',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-          },
-          {
-            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-          },
-          {
-            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-          }
-        ]
-      })
-    });
+    // Prepare the complete message with context
+    const fullMessage = `${systemContext}\n\nPrevious conversation:\n${
+      conversationHistory
+        .slice(-4)
+        .map(msg => `${msg.role}: ${msg.parts}`)
+        .join("\n")
+    }\n\nUser: ${validatedMessage}`;
 
-    if (!response.ok) {
-      if (retryCount < MAX_RETRIES) {
-        console.log(`Attempt ${retryCount + 1} failed, retrying...`);
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (retryCount + 1)));
-        return sendMessageToGemini(message, retryCount + 1);
-      }
-      throw new Error(`Failed to get response from Gemini: ${response.status}`);
-    }
+    // Get the response from Gemini
+    const result = await model.generateContent(fullMessage);
+    const response = await result.response;
+    const text = response.text();
 
-    const data = await response.json();
-    
-    if (!data.candidates || data.candidates.length === 0) {
-      throw new Error('No response generated');
-    }
+    // Add AI response to history
+    conversationHistory.push({ role: "model", parts: text });
 
-    const responseText = data.candidates[0].content.parts[0].text;
-    const formattedResponse = formatResponse(responseText);
-    
-    // Add bot response to history
-    conversationHistory.push({ role: 'assistant', content: formattedResponse });
-    
-    // Keep only the last 10 messages to prevent context from getting too large
+    // Keep history manageable
     if (conversationHistory.length > 10) {
       conversationHistory = conversationHistory.slice(-10);
     }
-    
-    return formattedResponse;
+
+    return text;
   } catch (error) {
-    console.error('Error calling Gemini API:', error);
-    throw error;
+    const errorMessage = handleGeminiError(error);
+    console.error("Error in Gemini service:", error);
+    return errorMessage;
   }
 };
 
-const formatResponse = (text) => {
-  // Remove any system context that might have been included
-  text = text.replace(systemContext, '').trim();
-  
-  // Remove any "User message:" prefix that might be in the response
-  text = text.replace(/^User message:.*$/m, '').trim();
-  
-  // Clean up any extra whitespace or newlines
-  text = text.replace(/\n{3,}/g, '\n\n').trim();
-  
-  return text;
-};
-
-// Helper function to check if the API key is configured
-export const isGeminiConfigured = () => {
-  return Boolean(GEMINI_API_KEY);
-};
-
-// Function to handle API errors
-export const handleGeminiError = (error) => {
-  if (!GEMINI_API_KEY) {
-    return 'The AI service is not properly configured. Please set up the REACT_APP_GEMINI_API_KEY environment variable.';
-  }
-  
-  if (error.message.includes('API key')) {
-    return 'The AI service is not properly configured. Please check your API key.';
-  }
-  
-  if (error.message.includes('rate limit')) {
-    return 'The service is experiencing high traffic. Please try again in a moment.';
-  }
-  
-  if (error.message.includes('429')) {
-    return 'Too many requests. Please wait a moment before trying again.';
-  }
-
-  console.error('Gemini API Error:', error);
-  return 'I apologize, but I\'m having trouble processing your request. Please try again in a moment.';
-};
-
-// Get conversation history
-export const getConversationHistory = () => {
-  return conversationHistory;
-};
-
-// Clear conversation history
+/**
+ * Clears the conversation history
+ */
 export const clearConversationHistory = () => {
   conversationHistory = [];
 };
 
-// Function to validate messages before sending
-export const validateMessage = (message) => {
-  if (!message || message.trim().length === 0) {
-    throw new Error('Message cannot be empty');
-  }
-  
-  if (message.length > 500) {
-    throw new Error('Message is too long. Please keep it under 500 characters.');
-  }
-  
-  return message.trim();
+/**
+ * Gets the current conversation history
+ */
+export const getConversationHistory = () => {
+  return [...conversationHistory];
 };

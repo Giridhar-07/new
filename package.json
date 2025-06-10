@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@google/generative-ai": "^0.24.1",
     "@react-three/drei": "^9.97.5",
     "@react-three/fiber": "^8.15.16",
     "@testing-library/jest-dom": "^5.17.0",

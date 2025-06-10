@@ -118,8 +118,25 @@ function Rooms() {
     showToast('Filters cleared', 'success');
   };
 
+  if (!token) {
+    return (
+      <div className="auth-required">
+        <h2>Authentication Required</h2>
+        <p>Please login to view our exclusive room collection.</p>
+        <Link to="/login" className="login-redirect-button">
+          Login to Continue
+        </Link>
+      </div>
+    );
+  }
+
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading luxurious rooms...</p>
+      </div>
+    );
   }
 
   return (
@@ -198,7 +215,7 @@ function Rooms() {
         )}
       </div>
 
-      <div className="rooms-grid">
+      <div className="rooms-grid" style={{ opacity: loading ? 0.7 : 1, transition: 'opacity 0.3s ease' }}>
         {rooms.length > 0 ? (
           rooms.map((room) => (
             <div key={room.id} className="room-card">
@@ -246,10 +263,14 @@ function Rooms() {
           ))
         ) : (
           <div className="no-rooms">
-            <p>No rooms found matching your criteria.</p>
-            <button onClick={clearFilters} className="clear-filters">
-              Clear Filters
-            </button>
+            <div className="no-rooms-content">
+              <img src="/images/no-results.svg" alt="No results" className="no-results-image" />
+              <h3>No Rooms Found</h3>
+              <p>We couldn't find any rooms matching your criteria.</p>
+              <button onClick={clearFilters} className="clear-filters">
+                Reset Filters
+              </button>
+            </div>
           </div>
         )}
       </div>
