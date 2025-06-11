@@ -16,7 +16,7 @@ function useAuth() {
         throw new Error('No token found');
       }
 
-      const response = await fetch('http://localhost:8000/api/profile/', {
+      const response = await fetch('http://localhost:8000/api/verify-token/', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -24,7 +24,7 @@ function useAuth() {
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data);
+        setUser(data.user);
         setIsAuthenticated(true);
       } else if (response.status === 401) {
         const refreshToken = localStorage.getItem('refreshToken');
@@ -76,6 +76,7 @@ function useAuth() {
     if (token) {
       checkAuth();
     } else {
+      setIsAuthenticated(false);
       setIsLoading(false);
     }
   }, [checkAuth]);
@@ -99,8 +100,8 @@ function useAuth() {
       if (response.ok) {
         localStorage.setItem('accessToken', data.access);
         localStorage.setItem('refreshToken', data.refresh);
-        setIsAuthenticated(true);
         setUser(data.user);
+        setIsAuthenticated(true);
         addToast(`Welcome back${data.user?.first_name ? ', ' + data.user.first_name : ''}!`, 'success');
         navigate('/');
         return { success: true, user: data.user };
@@ -155,11 +156,11 @@ function useAuth() {
 
       if (response.ok) {
         addToast(data.message || 'Registration successful! Please login.', 'success');
+        navigate('/login');
         return true;
       } else {
         let errorMessage = 'Registration failed.';
         
-        // Handle various error response formats
         if (data.error) {
           errorMessage = data.error;
         } else if (typeof data === 'object') {
@@ -192,13 +193,11 @@ function useAuth() {
 
   return {
     isAuthenticated,
-    setIsAuthenticated,
     isLoading,
     user,
     login,
     logout,
     register,
-    token: localStorage.getItem('accessToken'),
   };
 }
 

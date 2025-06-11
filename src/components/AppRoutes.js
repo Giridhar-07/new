@@ -11,34 +11,16 @@ import useAuth from '../hooks/useAuth';
 import '../App.css';
 
 function AppRoutes() {
-  const { isAuthenticated, setIsAuthenticated, logout } = useAuth();
-
   return (
     <div className="app">
-      <Header isAuthenticated={isAuthenticated} onLogout={logout} />
+      <Header />
       <main className="main-content">
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/rooms" element={<Rooms />} />
             <Route path="/rooms/:id" element={<RoomDetails />} />
-            <Route
-              path="/login"
-              element={
-                <Login
-                  isAuthenticated={isAuthenticated}
-                  setIsAuthenticated={setIsAuthenticated}
-                />
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <Register
-                  isAuthenticated={isAuthenticated}
-                  setIsAuthenticated={setIsAuthenticated}
-                />
-              }
-            />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/contact" element={<Contact />} />
           </Routes>
       </main>
