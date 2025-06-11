@@ -7,7 +7,7 @@ function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-  const showToast = useToast();
+  const { addToast } = useToast();
 
   const checkAuth = useCallback(async () => {
     try {
@@ -101,12 +101,12 @@ function useAuth() {
         localStorage.setItem('refreshToken', data.refresh);
         setIsAuthenticated(true);
         setUser(data.user);
-        showToast(`Welcome back${data.user?.first_name ? ', ' + data.user.first_name : ''}!`, 'success');
+        addToast(`Welcome back${data.user?.first_name ? ', ' + data.user.first_name : ''}!`, 'success');
         navigate('/');
         return { success: true, user: data.user };
       } else {
         const errorMessage = data.error || data.detail || 'Login failed';
-        showToast(errorMessage, 'error');
+        addToast(errorMessage, 'error');
         return {
           success: false,
           error: errorMessage,
@@ -114,7 +114,7 @@ function useAuth() {
       }
     } catch (error) {
       console.error('Login error:', error);
-      showToast('Network error. Please try again.', 'error');
+      addToast('Network error. Please try again.', 'error');
       return {
         success: false,
         error: 'Network error',
@@ -129,7 +129,7 @@ function useAuth() {
     localStorage.removeItem('refreshToken');
     setIsAuthenticated(false);
     setUser(null);
-    showToast('Successfully logged out!', 'success');
+    addToast('Successfully logged out!', 'success');
     navigate('/');
   };
 
@@ -154,7 +154,7 @@ function useAuth() {
       const data = await response.json();
 
       if (response.ok) {
-        showToast(data.message || 'Registration successful! Please login.', 'success');
+        addToast(data.message || 'Registration successful! Please login.', 'success');
         return true;
       } else {
         let errorMessage = 'Registration failed.';
@@ -178,12 +178,12 @@ function useAuth() {
           }
         }
         
-        showToast(errorMessage, 'error');
+        addToast(errorMessage, 'error');
         return false;
       }
     } catch (error) {
       console.error('Registration error:', error);
-      showToast('Network error. Please try again.', 'error');
+      addToast('Network error. Please try again.', 'error');
       return false;
     } finally {
       setIsLoading(false);

@@ -120,10 +120,11 @@ function Rooms() {
     addToast('Filters cleared', 'success');
   };
 
-  if (!token) {
-    navigate('/login', { state: { from: '/rooms' } });
-    return null;
-  }
+  useEffect(() => {
+    if (!token) {
+      navigate('/login', { state: { from: '/rooms' } });
+    }
+  }, [token, navigate]);
 
   if (loading) {
     return (
