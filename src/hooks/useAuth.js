@@ -100,31 +100,20 @@ function useAuth() {
         localStorage.setItem('accessToken', data.access);
         localStorage.setItem('refreshToken', data.refresh);
         setIsAuthenticated(true);
-        showToast('Successfully logged in!', 'success');
+        setUser(data.user);
+        showToast(`Welcome back${data.user?.first_name ? ', ' + data.user.first_name : ''}!`, 'success');
         navigate('/');
-        return { success: true };
+        return { success: true, user: data.user };
       } else {
-        if (data.is_locked) {
-          const remainingTime = Math.ceil(
-            (new Date(data.locked_until) - new Date()) / (1000 * 60)
-          );
-          showToast(
-            `Account locked. Please try again in ${remainingTime} minutes.`,
-            'error'
-          );
-          return {
-            success: false,
-            error: 'Account locked',
-            lockedUntil: data.locked_until,
-          };
-        }
-        showToast(data.detail || 'Login failed', 'error');
+        const errorMessage = data.error || data.detail || 'Login failed';
+        showToast(errorMessage, 'error');
         return {
           success: false,
-          error: data.detail || 'Login failed',
+          error: errorMessage,
         };
       }
     } catch (error) {
+      console.error('Login error:', error);
       showToast('Network error. Please try again.', 'error');
       return {
         success: false,
@@ -144,7 +133,7 @@ function useAuth() {
     navigate('/');
   };
 
-  const register = async ({ username, email, password }) => {
+  const register = async (formData) => {
     try {
       setIsLoading(true);
       const response = await fetch('http://localhost:8000/api/register/', {
@@ -153,24 +142,47 @@ function useAuth() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username,
-          email,
-          password,
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          phone: formData.phone,
         }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        showToast('Registration successful! Please login.', 'success');
+        showToast(data.message || 'Registration successful! Please login.', 'success');
         return true;
       } else {
-        const errorMessage = data.detail || 
-          Object.values(data).flat().join(' ');
+        let errorMessage = 'Registration failed.';
+        
+        // Handle various error response formats
+        if (data.error) {
+          errorMessage = data.error;
+        } else if (typeof data === 'object') {
+          const errors = Object.entries(data)
+            .map(([field, messages]) => {
+              if (Array.isArray(messages)) {
+                return `${field}: ${messages.join(', ')}`;
+              }
+              return `${field}: ${messages}`;
+            })
+            .filter(msg => msg)
+            .join('; ');
+          
+          if (errors) {
+            errorMessage = errors;
+          }
+        }
+        
         showToast(errorMessage, 'error');
         return false;
       }
     } catch (error) {
+      console.error('Registration error:', error);
       showToast('Network error. Please try again.', 'error');
       return false;
     } finally {
