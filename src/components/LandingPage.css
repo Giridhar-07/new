@@ -88,33 +88,48 @@
 }
 
 .features, .about, .amenities {
-  padding: 8rem 2rem;
+  padding: 5rem 0.5rem;
   position: relative;
 }
 
 .features h2, .about h2, .amenities h2 {
   text-align: center;
-  font-size: 3rem;
+  font-size: 3.25rem;
   font-weight: 800;
-  margin-bottom: 4rem;
+  margin-bottom: 5rem;
   background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+  position: relative;
+}
+
+.features h2::after {
+  content: '';
+  position: absolute;
+  bottom: -1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  border-radius: 2px;
 }
 
 .features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 3rem;
-  max-width: 1200px;
+  gap: 1.5rem;
+  max-width: 1200px; /* Increased max-width for larger screens */
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0;
+  justify-content: center;
 }
 
 .feature-card {
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  padding: 3rem 2rem;
+  border-radius: 16px;
+  padding: 2rem 1.2rem;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -122,6 +137,11 @@
   position: relative;
   overflow: hidden;
   text-align: center;
+  margin: 0.3rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .feature-card::before {
@@ -153,24 +173,28 @@
 }
 
 .feature-card h3 {
-  font-size: 1.5rem;
-  margin: 1.5rem 0;
+  font-size: 1.25rem;
+  margin: 1.2rem 0 1rem;
   background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   transition: all 0.3s ease;
+  letter-spacing: 0.5px;
 }
 
 .feature-card p {
   color: #94a3b8;
-  line-height: 1.6;
-  margin-top: 1rem;
+  line-height: 1.5;
+  margin-top: 0.8rem;
+  font-size: 0.98rem;
+  padding: 0 0.2rem;
 }
 
 .feature-card img {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   margin: 0 auto;
+  filter: drop-shadow(0 4px 6px rgba(59, 130, 246, 0.3));
 }
 
 .feature-card:hover h3 {
@@ -361,23 +385,60 @@
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   .features-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+    gap: 1.5rem; /* Adjusted gap */
+    padding: 0 1rem; /* Adjusted padding */
+  }
+  .feature-card {
+    padding: 2rem 1.2rem; /* Adjusted padding */
+    margin: 0.3rem; /* Adjusted margin */
+  }
+  .feature-card h3 {
+    font-size: 1.25rem;
+    margin: 1.2rem 0 1rem;
+  }
+  .feature-card p {
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 900px) {
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem; /* Adjusted gap */
+    padding: 0 0.5rem; /* Adjusted padding */
+  }
+  .feature-card {
+    padding: 1.5rem 1rem; /* Adjusted padding */
+    margin: 0.3rem 0; /* Adjusted margin */
   }
 }
 
 @media (max-width: 768px) {
   .features-grid {
     grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 0 1rem;
+    gap: 1.5rem; /* Adjusted gap */
+    padding: 0 0.5rem; /* Adjusted padding */
   }
 
   .feature-card {
-    padding: 2rem;
+    padding: 1.5rem 1rem; /* Adjusted padding */
+    margin: 0.3rem 0; /* Adjusted margin */
   }
+  
+  .feature-card h3 {
+    font-size: 1.25rem;
+    margin: 1.2rem 0 1rem;
+  }
+  
+  .feature-card p {
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+}
 
   .glass-effect {
     padding: 2rem;
@@ -402,4 +463,3 @@
   .feature-card, .amenity {
     padding: 1.5rem;
   }
-}
